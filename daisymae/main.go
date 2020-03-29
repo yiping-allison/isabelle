@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"os/signal"
@@ -10,15 +9,6 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 )
-
-var (
-	token string
-)
-
-func init() {
-	flag.StringVar(&token, "token", "", "Set the bot's discord token using this flag.")
-	flag.Parse()
-}
 
 func main() {
 	bc, err := LoadConfig()
