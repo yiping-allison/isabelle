@@ -1,0 +1,5 @@
+# Remove my configuration settings
+.config
+
+# Remove executables
+*.exe
