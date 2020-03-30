@@ -22,11 +22,11 @@ func main() {
 	}
 	daisy.SetPrefix(bc.BotPrefix)
 	err = daisy.DS.Open()
-	defer daisy.DS.Close()
 	if err != nil {
 		fmt.Printf("Error opening connection; err = %v\n", err)
 		return
 	}
+	defer daisy.DS.Close()
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)

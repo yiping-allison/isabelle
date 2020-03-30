@@ -23,7 +23,6 @@ type Bot struct {
 // empty bot and err upon failure
 func New(bc string) (*Bot, error) {
 	if bc == "" {
-		fmt.Println("You need to input a botKey in the .config file")
 		return &Bot{}, errors.New("daisymaebot: you need to input a botKey in the .config file")
 	}
 	discord, err := discordgo.New("Bot " + bc)
@@ -62,18 +61,29 @@ type Command struct {
 // processCmd attemps to process any string that is prefixed with bot notifier
 //
 // Valid commands will be run while invalid commands will be ignored
+//
+// Example bot commands:
+//
+// ?ping
+//
+// ?ping help
 func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// NOTE: Only able to parse multi words for bot help commands
+	// TODO: Be able to parse search commands: ?search monarch butterfly brings up
+	//       all info of insect in New Horizons game
 	cmds := strings.Split(m.Content[len(b.Prefix):], " ")
 	trim := strings.TrimPrefix(cmds[0], b.Prefix)
 	res := b.find(trim)
 	if reflect.DeepEqual(res, Command{}) {
 		return
 	}
-	if len(cmds) > 1 && cmds[1] == "help" {
+	if len(cmds) > 1 && strings.TrimSpace(cmds[1]) == "help" {
+		// if line is multipart and follows help command
+		// print command's help line
 		b.printHelp(trim, res.Help, s, m)
 		return
 	}
+	// Else: run command
 	ci := cmd.CommandInfo{
 		Ses: s,
 		Msg: m,
@@ -84,7 +94,7 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 // finds a command in the command map
 //
 // If it exists, it returns the Command
-// If not, it returns at empty Command
+// If not, it returns an empty Command
 func (b *Bot) find(name string) Command {
 	if val, ok := b.Commands[name]; ok {
 		return val
