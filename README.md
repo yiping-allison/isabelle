@@ -17,7 +17,7 @@ below.
 
 1. Clone or Download Repository or run `go get github.com/yiping-allison/daisy-mae`
 2. Configure example.config file and rename the file to: `.config`
-3. Run `go build ./daisymae`
+3. Run `go build`
 4. Run executable
 
 ## Bugs & Contributing

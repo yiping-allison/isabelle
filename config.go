@@ -12,6 +12,9 @@ type BotConfig struct {
 }
 
 // LoadConfig loads bot configuration variables
+// from the following file in main directory:
+//
+// .config
 func LoadConfig() (BotConfig, error) {
 	f, err := os.Open(".config")
 	if err != nil {
