@@ -8,7 +8,8 @@ import (
 
 // BotConfig represents bot configurations
 type BotConfig struct {
-	BotKey string `json:"botKey"`
+	BotKey    string `json:"botKey"`
+	BotPrefix string `json:"botPrefix"`
 }
 
 // LoadConfig loads bot configuration variables

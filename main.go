@@ -17,9 +17,10 @@ func main() {
 	}
 	daisy, err := daisymaebot.New(bc.BotKey)
 	if err != nil {
-		fmt.Printf("error setting up bot; err = %v\n", err)
+		fmt.Printf("%s", err)
 		return
 	}
+	daisy.SetPrefix(bc.BotPrefix)
 	err = daisy.DS.Open()
 	defer daisy.DS.Close()
 	if err != nil {
