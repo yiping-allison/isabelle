@@ -8,12 +8,14 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/yiping-allison/daisymae/cmd"
+	"github.com/yiping-allison/daisymae/service"
 )
 
 // Bot represents a daisymae bot instance
 type Bot struct {
-	Prefix   string
 	DS       *discordgo.Session
+	Service  service.Services
+	Prefix   string
 	Commands map[string]Command
 }
 
@@ -34,6 +36,7 @@ func New(bc string) (*Bot, error) {
 	daisy := &Bot{
 		Prefix:   "?",
 		DS:       discord,
+		Service:  service.Services{},
 		Commands: cmds,
 	}
 	daisy.compileCommands()
@@ -126,7 +129,7 @@ func (b *Bot) compileCommands() {
 // utility func to add command to bot command map
 func (b *Bot) addCommand(name, help string, cmd func(cmd.CommandInfo)) {
 	if _, ok := b.Commands[name]; ok {
-		fmt.Printf("addCommand err: %s already exists in the map\n", name)
+		fmt.Printf("addCommand: %s already exists in the map\n", name)
 		return
 	}
 	command := Command{
