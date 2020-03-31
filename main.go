@@ -17,7 +17,6 @@ func main() {
 		fmt.Printf("error loading config; err = %s\n", err)
 		return
 	}
-	fmt.Println(bc)
 	// TODO: Implement database connection
 	// TODO: Test database connection
 	dbCfg := bc.Database

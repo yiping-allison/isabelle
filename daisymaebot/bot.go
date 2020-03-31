@@ -67,11 +67,10 @@ type Command struct {
 //
 // Example bot commands:
 //
-// ?ping
+// ?search
 //
-// ?ping help
+// ?search help
 func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
-	// NOTE: Only able to parse multi words for bot help commands
 	// TODO: Be able to parse search commands: ?search monarch butterfly brings up
 	//       all info of insect in New Horizons game
 	cmds := strings.Split(m.Content[len(b.Prefix):], " ")
@@ -80,17 +79,25 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if reflect.DeepEqual(res, Command{}) {
 		return
 	}
-	if len(cmds) > 1 && strings.TrimSpace(cmds[1]) == "help" {
-		// if line is multipart and follows help command
-		// print command's help line
-		b.printHelp(trim, res.Help, s, m)
-		return
-	}
-	// Else: run command
 	ci := cmd.CommandInfo{
-		Ses: s,
-		Msg: m,
+		Ses:     s,
+		Msg:     m,
+		Service: b.Service,
+		CmdName: trim,
+		CmdOps:  cmds,
+		CmdHlp:  res.Help,
 	}
+	if trim == "help" && len(cmds) > 1 {
+		// if command given is a help command
+		ci.CmdName = strings.Join(cmds[1:], " ")
+		tmp := b.find(ci.CmdName)
+		if reflect.DeepEqual(tmp, Command{}) {
+			ci.CmdHlp = "This command does not exist."
+		} else {
+			ci.CmdHlp = b.find(ci.CmdName).Help
+		}
+	}
+	// Run command
 	res.Cmd(ci)
 }
 
@@ -105,23 +112,14 @@ func (b *Bot) find(name string) Command {
 	return Command{}
 }
 
-// Pretty prints a command's help tag using discord message embedding
-func (b *Bot) printHelp(cmdName, help string, s *discordgo.Session, m *discordgo.MessageCreate) {
-	emThumb := &discordgo.MessageEmbedThumbnail{
-		URL:    "https://www.bbqguru.com/content/images/manual-bbq-icon.png",
-		Width:  100,
-		Height: 100,
-	}
-	emMsg := &discordgo.MessageEmbed{
-		Title:       cmdName,
-		Description: help,
-		Thumbnail:   emThumb,
-	}
-	s.ChannelMessageSendEmbed(m.ChannelID, emMsg)
-}
-
 // compileCommands contains all commands the bot should add to the bot command map
 func (b *Bot) compileCommands() {
+	b.addCommand("search", `Search for an insect or fish in the database
+		Example:
+		?search Tarantula`, cmd.Search)
+	b.addCommand("help", `Search how to use a command
+		Example:
+		?help search`, cmd.Help)
 	b.addCommand("ping", "Tells the bot to ping", cmd.Ping)
 	b.addCommand("pong", "Tells bot to respond with ping", cmd.Pong)
 }
