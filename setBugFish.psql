@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS daisymae (
+Name character varying(255), 
+SellPrice INT,
+NorthernHemisphere character varying(255),
+SouthernHemisphere character varying(255),
+TimeofDay character varying(255),
+Location character varying(255),
+Image character varying(255)
+);
+
+COPY daisymae (Name, SellPrice, NorthernHemisphere, SouthernHemisphere, TimeofDay, Location, Image) 
+FROM 'C:\tmp\persons.csv' DELIMITER ',' CSV HEADER;
