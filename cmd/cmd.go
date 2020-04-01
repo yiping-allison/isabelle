@@ -14,7 +14,11 @@ import (
 //
 // Service: contains all services needed by bot (bot)
 //
-// Cmd: contains full valid command input by user in discord (bot)
+// CmdName: contains the command name
+//
+// CmdOps: the full slice of commands (unparsed)
+//
+// CmdHlp: contains the command's help string
 type CommandInfo struct {
 	Ses     *discordgo.Session
 	Msg     *discordgo.MessageCreate

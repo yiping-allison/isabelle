@@ -8,10 +8,7 @@ import (
 
 // Search will look up a possible insect or fish in the database and display to the user
 func Search(cmdInfo CommandInfo) {
-	// TODO: Finish this
-	cmdInfo.Ses.ChannelMessageSend(cmdInfo.Msg.ChannelID, "Testing search!")
-
-	// TODO: write func to parse through search arguments
+	// TODO: Refactor and Prettier Formatting?
 	formatStr := toLowerAndFormat(cmdInfo.CmdOps[1:])
 	entry, err := cmdInfo.Service.Entry.ByName(formatStr, "bug_and_fish")
 	searchItem := formatName(cmdInfo.CmdOps[1:])

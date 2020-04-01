@@ -3,7 +3,6 @@ package daisymaebot
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -76,7 +75,7 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 	cmds := strings.Split(m.Content[len(b.Prefix):], " ")
 	trim := strings.TrimPrefix(cmds[0], b.Prefix)
 	res := b.find(trim)
-	if reflect.DeepEqual(res, Command{}) {
+	if res == nil {
 		return
 	}
 	ci := cmd.CommandInfo{
@@ -91,7 +90,7 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// if command given is a help command
 		ci.CmdName = strings.Join(cmds[1:], " ")
 		tmp := b.find(ci.CmdName)
-		if reflect.DeepEqual(tmp, Command{}) {
+		if tmp == nil {
 			ci.CmdHlp = "This command does not exist."
 		} else {
 			ci.CmdHlp = b.find(ci.CmdName).Help
@@ -105,11 +104,11 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 //
 // If it exists, it returns the Command
 // If not, it returns an empty Command
-func (b *Bot) find(name string) Command {
+func (b *Bot) find(name string) *Command {
 	if val, ok := b.Commands[name]; ok {
-		return val
+		return &val
 	}
-	return Command{}
+	return nil
 }
 
 // compileCommands contains all commands the bot should add to the bot command map

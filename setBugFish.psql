@@ -8,4 +8,4 @@ Location character varying(255),
 Image character varying(255)
 );
 
-\COPY bug_and_fish FROM 'C:\Users\yipin\go\src\github.com\yiping-allison\daisymae\data.csv' DELIMITER ',' CSV HEADER;
+\COPY bug_and_fish FROM 'Set the filepath here' DELIMITER ',' CSV HEADER;

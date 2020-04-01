@@ -7,6 +7,7 @@ import "github.com/bwmarrin/discordgo"
 // It prints the help message of a specific bot command using
 // Discord's message embedding
 func Help(cmdInfo CommandInfo) {
+	// TODO: Prettier formatting?
 	emThumb := &discordgo.MessageEmbedThumbnail{
 		URL:    "https://www.bbqguru.com/content/images/manual-bbq-icon.png",
 		Width:  100,
