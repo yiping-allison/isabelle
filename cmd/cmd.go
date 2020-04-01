@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"github.com/yiping-allison/daisymae/service"
+	"github.com/yiping-allison/daisymae/models"
 )
 
 // CommandInfo represents all metadata discord and bot needs to
@@ -18,7 +18,7 @@ import (
 type CommandInfo struct {
 	Ses     *discordgo.Session
 	Msg     *discordgo.MessageCreate
-	Service service.Services
+	Service models.Services
 	CmdName string
 	CmdOps  []string
 	CmdHlp  string

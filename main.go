@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	_ "github.com/lib/pq"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/yiping-allison/daisymae/daisymaebot"
-	"github.com/yiping-allison/daisymae/service"
+	"github.com/yiping-allison/daisymae/models"
 )
 
 func main() {
@@ -20,9 +20,10 @@ func main() {
 	// TODO: Implement database connection
 	// TODO: Test database connection
 	dbCfg := bc.Database
-	services, err := service.NewServices(
-		service.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
-		service.WithLogMode(true),
+	services, err := models.NewServices(
+		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
+		models.WithLogMode(true),
+		models.WithEntries(),
 	)
 	if err != nil {
 		fmt.Println(err)

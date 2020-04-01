@@ -8,13 +8,13 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/yiping-allison/daisymae/cmd"
-	"github.com/yiping-allison/daisymae/service"
+	"github.com/yiping-allison/daisymae/models"
 )
 
 // Bot represents a daisymae bot instance
 type Bot struct {
 	DS       *discordgo.Session
-	Service  service.Services
+	Service  models.Services
 	Prefix   string
 	Commands map[string]Command
 }
@@ -36,7 +36,7 @@ func New(bc string) (*Bot, error) {
 	daisy := &Bot{
 		Prefix:   "?",
 		DS:       discord,
-		Service:  service.Services{},
+		Service:  models.Services{},
 		Commands: cmds,
 	}
 	daisy.compileCommands()

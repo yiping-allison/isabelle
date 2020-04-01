@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS daisymae (
+CREATE TABLE IF NOT EXISTS bug_and_fish (
 Name character varying(255), 
 SellPrice INT,
 NorthernHemisphere character varying(255),
@@ -8,5 +8,4 @@ Location character varying(255),
 Image character varying(255)
 );
 
-COPY daisymae (Name, SellPrice, NorthernHemisphere, SouthernHemisphere, TimeofDay, Location, Image) 
-FROM 'C:\tmp\persons.csv' DELIMITER ',' CSV HEADER;
+\COPY bug_and_fish FROM 'C:\Users\yipin\go\src\github.com\yiping-allison\daisymae\data.csv' DELIMITER ',' CSV HEADER;

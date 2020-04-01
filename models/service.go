@@ -1,4 +1,4 @@
-package service
+package models
 
 import "github.com/jinzhu/gorm"
 
@@ -6,7 +6,8 @@ import "github.com/jinzhu/gorm"
 
 // Services handles services for bot
 type Services struct {
-	db *gorm.DB
+	db    *gorm.DB
+	Entry EntryService
 }
 
 // ServicesConfig represents functions that are meant to be running configurations
@@ -37,6 +38,14 @@ func WithGorm(dialect, connectionInfo string) ServicesConfig {
 	}
 }
 
+// WithEntries will initialize entry database
+func WithEntries() ServicesConfig {
+	return func(s *Services) error {
+		s.Entry = NewEntryService(s.db)
+		return nil
+	}
+}
+
 // WithLogMode makes sure that every database interaction in logged whether
 // for debugging or other logging purposes
 func WithLogMode(mode bool) ServicesConfig {
@@ -51,9 +60,7 @@ func (s Services) Close() error {
 	return s.db.Close()
 }
 
-// FIXME:
-// temp until I test sql tables
 // AutoMigrate attempts to automigrate sql tables
-// func (s Services) AutoMigrate() error {
-// 	return s.db.AutoMigrate(&User{}, &Gallery{}).Error
-// }
+func (s Services) AutoMigrate() error {
+	return s.db.AutoMigrate(&Entry{}).Error
+}
