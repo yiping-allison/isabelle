@@ -9,6 +9,7 @@ import (
 // Search will look up a possible insect or fish in the database and display to the user
 func Search(cmdInfo CommandInfo) {
 	// TODO: Refactor and Prettier Formatting?
+	// TODO: List out top 3 Like matches in not found option
 	if len(cmdInfo.CmdOps) == 1 {
 		return
 	}
@@ -50,13 +51,10 @@ func toLowerAndFormat(args []string) string {
 	for _, word := range args {
 		endStr = append(endStr, strings.ToLower(word))
 	}
-	databaseFormat := ""
 	if len(args) > 1 {
-		databaseFormat = strings.Join(endStr, "_")
-	} else {
-		databaseFormat = endStr[0]
+		return strings.Join(endStr, "_")
 	}
-	return databaseFormat
+	return endStr[0]
 }
 
 // helper func to format search names for pretty printing
@@ -73,6 +71,5 @@ func formatName(str []string) string {
 		tmp := strings.Title(strings.ToLower(word))
 		endStr = append(endStr, tmp)
 	}
-	final := strings.Join(endStr, " ")
-	return final
+	return strings.Join(endStr, " ")
 }

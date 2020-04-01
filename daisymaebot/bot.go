@@ -40,11 +40,13 @@ func New(bc string) (*Bot, error) {
 	}
 	daisy.compileCommands()
 	// Add Handlers
-	daisy.DS.AddHandler(daisy.messageCreate)
+	daisy.DS.AddHandler(daisy.handleMessage)
 	return daisy, nil
 }
 
-func (b *Bot) messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+// handleMessage handles all new discord messages which the bot uses to determine
+// actions
+func (b *Bot) handleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// Ignore all messages created by the bot itself
 	if m.Author.ID == s.State.User.ID {
 		return
