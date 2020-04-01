@@ -6,7 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/yiping-allison/daisymae/daisymaebot"
+	"github.com/yiping-allison/daisymae/models"
 )
 
 func main() {
@@ -15,11 +17,26 @@ func main() {
 		fmt.Printf("error loading config; err = %s\n", err)
 		return
 	}
+	// TODO: Implement database connection
+	// TODO: Test database connection
+	dbCfg := bc.Database
+	services, err := models.NewServices(
+		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
+		models.WithLogMode(true),
+		models.WithEntries(),
+	)
+	if err != nil {
+		fmt.Println(err)
+	}
 	daisy, err := daisymaebot.New(bc.BotKey)
 	if err != nil {
 		fmt.Printf("%s", err)
 		return
 	}
+	daisy.Service = *services
+	// FIXME: Uncomment after integrating sql types
+	// daisy.Service.AutoMigrate()
+	defer daisy.Service.Close()
 	daisy.SetPrefix(bc.BotPrefix)
 	err = daisy.DS.Open()
 	if err != nil {

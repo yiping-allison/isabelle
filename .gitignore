@@ -1,5 +1,8 @@
-# Remove my configuration settings
+# Remove configuration settings
 .config
+
+# Remove data
+*.csv
 
 # Remove executables
 *.exe

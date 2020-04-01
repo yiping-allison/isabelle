@@ -2,3 +2,4 @@
 
 .gitattributes  export-ignore
 README.md       export-ignore
+.github/        export-ignore
