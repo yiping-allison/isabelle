@@ -70,8 +70,6 @@ type Command struct {
 //
 // ?search help
 func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
-	// TODO: Be able to parse search commands: ?search monarch butterfly brings up
-	//       all info of insect in New Horizons game
 	cmds := strings.Split(m.Content[len(b.Prefix):], " ")
 	trim := strings.TrimPrefix(cmds[0], b.Prefix)
 	res := b.find(trim)
@@ -116,7 +114,7 @@ func (b *Bot) compileCommands() {
 	b.addCommand("search", `Search for an insect or fish in the database
 		Example:
 		?search Tarantula`, cmd.Search)
-	b.addCommand("help", `Search how to use a command
+	b.addCommand("help", `Look up how to use a command
 		Example:
 		?help search`, cmd.Help)
 	b.addCommand("ping", "Tells the bot to ping", cmd.Ping)

@@ -9,6 +9,9 @@ import (
 // Search will look up a possible insect or fish in the database and display to the user
 func Search(cmdInfo CommandInfo) {
 	// TODO: Refactor and Prettier Formatting?
+	if len(cmdInfo.CmdOps) == 1 {
+		return
+	}
 	formatStr := toLowerAndFormat(cmdInfo.CmdOps[1:])
 	entry, err := cmdInfo.Service.Entry.ByName(formatStr, "bug_and_fish")
 	searchItem := formatName(cmdInfo.CmdOps[1:])
@@ -27,8 +30,8 @@ func Search(cmdInfo CommandInfo) {
 	} else {
 		emThumb := &discordgo.MessageEmbedThumbnail{
 			URL:    entry.Image,
-			Width:  100,
-			Height: 100,
+			Width:  200,
+			Height: 200,
 		}
 		emMsg := &discordgo.MessageEmbed{
 			Title:       searchItem,
@@ -64,7 +67,7 @@ func toLowerAndFormat(args []string) string {
 func formatName(str []string) string {
 	// BUG: Go's string package has a bug in which unicode punctuation aren't
 	// accounted for - will fail "with apostrophes" test
-	// FIXME: Either find a workaround for this or wait till new golang patch
+	// FIXME: Either find a workaround for this or wait til new golang patch
 	var endStr []string
 	for _, word := range str {
 		tmp := strings.Title(strings.ToLower(word))
