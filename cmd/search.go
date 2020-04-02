@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -29,18 +30,115 @@ func Search(cmdInfo CommandInfo) {
 		}
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 	} else {
+		nHemi, sHemi := parseHemi(entry.NorthSt, entry.NorthEnd, entry.SouthSt, entry.SouthEnd)
 		emThumb := &discordgo.MessageEmbedThumbnail{
 			URL:    entry.Image,
 			Width:  200,
 			Height: 200,
 		}
+		emPrice := &discordgo.MessageEmbedField{
+			Name:  "Price",
+			Value: strconv.Itoa(entry.SellPrice) + " Bells",
+		}
+		emHemiNorth := &discordgo.MessageEmbedField{
+			Name:  "Northern Hemisphere Months",
+			Value: nHemi,
+		}
+		emHemiSouth := &discordgo.MessageEmbedField{
+			Name:  "Southern Hemisphere Months",
+			Value: sHemi,
+		}
+		emTime := &discordgo.MessageEmbedField{
+			Name:  "Time",
+			Value: removeUnderscore(entry.Time),
+		}
 		emMsg := &discordgo.MessageEmbed{
 			Title:       searchItem,
-			Description: entry.Location,
+			Description: removeUnderscore(entry.Location),
 			Thumbnail:   emThumb,
+			Fields:      []*discordgo.MessageEmbedField{emPrice, emTime, emHemiNorth, emHemiSouth},
 		}
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 	}
+}
+
+// utility func to parse hemisphere data and return as
+// useful text users can read
+func parseHemi(ns, ne, st, se string) (string, string) {
+	northSt := strings.Split(ns, "|")
+	northEnd := strings.Split(ne, "|")
+	southSt := strings.Split(st, "|")
+	southEnd := strings.Split(se, "|")
+	if len(northSt) == 1 {
+		return formatDate(northSt[0] + " " + northEnd[0]), formatDate(southSt[0] + " " + southEnd[0])
+	}
+	var northMonths []string
+	var southMonths []string
+	if len(northSt) > 1 && len(northEnd) > 1 {
+		for i := 0; i < len(northSt); i++ {
+			northMonths = append(northMonths, northSt[i]+" "+northEnd[i])
+		}
+	}
+	if len(southSt) > 1 && len(southEnd) > 1 {
+		for i := 0; i < len(southSt); i++ {
+			southMonths = append(southMonths, southSt[i]+" "+southEnd[i])
+		}
+	}
+	return wrapDate(northMonths, southMonths)
+}
+
+// utility func which wraps entries where there are multiple
+// location months
+//
+// E.g. May to June AND September to November
+func wrapDate(north, south []string) (string, string) {
+	var n []string
+	var s []string
+	for i := 0; i < len(north); i++ {
+		n = append(n, formatDate(north[i]))
+		s = append(s, formatDate(south[i]))
+	}
+	return strings.Join(n, " and "), strings.Join(s, " and ")
+}
+
+// utility func to format dates
+//
+// This function parses date strings that have been turned into
+// month names and appends the month with 'to'
+func formatDate(date string) string {
+	d := strings.Split(date, " ")
+	if len(d) == 1 {
+		return ""
+	}
+	var dateS []string
+	for i := 0; i < len(d); i++ {
+		dateS = append(dateS, getMonth(d[i]))
+	}
+	return strings.Join(dateS, " to ")
+}
+
+// helper func to return a month name in string format
+// from integer format
+func getMonth(monthInt string) string {
+	monthNames := []string{
+		"January",
+		"February",
+		"March",
+		"April",
+		"May",
+		"June",
+		"July",
+		"August",
+		"September",
+		"October",
+		"November",
+		"December",
+	}
+	m, err := strconv.Atoi(monthInt)
+	if err != nil {
+		return ""
+	}
+	return monthNames[m-1]
 }
 
 // Helper func which formats argument list to match database keys
@@ -72,4 +170,11 @@ func formatName(str []string) string {
 		endStr = append(endStr, tmp)
 	}
 	return strings.Join(endStr, " ")
+}
+
+// utility func to replace all underscores with a space
+//
+// normalization for users
+func removeUnderscore(str string) string {
+	return strings.ReplaceAll(str, "_", " ")
 }

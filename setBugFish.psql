@@ -1,11 +1,14 @@
 CREATE TABLE IF NOT EXISTS bug_and_fish (
-Name character varying(255), 
-SellPrice INT,
-NorthernHemisphere character varying(255),
-SouthernHemisphere character varying(255),
-TimeofDay character varying(255),
-Location character varying(255),
-Image character varying(255)
+name character varying(255), 
+sell_price INT,
+north_start character varying(255),
+north_end character varying(255),
+south_start character varying(255),
+south_end character varying(255),
+time_of_day character varying(255),
+location character varying(255),
+image character varying(255)
 );
 
-\COPY bug_and_fish FROM 'Set the filepath here' DELIMITER ',' CSV HEADER;
+COPY bug_and_fish (name, sell_price, north_start, north_end, south_start, south_end, time_of_day, location, image) 
+FROM 'C:\Users\yipin\go\src\github.com\yiping-allison\daisymae\data.csv' DELIMITER ',' CSV HEADER;

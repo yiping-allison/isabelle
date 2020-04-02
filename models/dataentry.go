@@ -14,13 +14,15 @@ const (
 // Entry represents a database entry of either an insect or
 // fish in the postgres database
 type Entry struct {
-	Name      string `gorm:"not_null;index"`
-	SellPrice int    `gorm:"not_null"`
-	NHemi     string `gorm:"not_null"`
-	SHemi     string `gorm:"not_null"`
-	Time      string `gorm:"not_null"`
-	Location  string `gorm:"not_null"`
-	Image     string `gorm:"not_null"`
+	Name      string `gorm:"not null"`
+	SellPrice int    `gorm:"column:sell_price"`
+	NorthSt   string `gorm:"type:varchar(255);column:north_start"`
+	NorthEnd  string `gorm:"type:varchar(255);column:north_end"`
+	SouthSt   string `gorm:"type:varchar(255);column:south_start"`
+	SouthEnd  string `gorm:"type:varchar(255);column:south_end"`
+	Time      string `gorm:"type:varchar(255);column:time_of_day"`
+	Location  string `gorm:"type:varchar(255);column:location"`
+	Image     string `gorm:"type:varchar(255);column:image"`
 }
 
 type EntryService interface {
@@ -86,7 +88,7 @@ func (ev *entryValidator) hasName(e *Entry) error {
 // ByName looks up an entry by its name and returns the entry
 // if it exists.
 //
-// If not, we will return an erro
+// If not, we will return an error
 func (eg *entryGorm) ByName(name, tableName string) (*Entry, error) {
 	var entry Entry
 	db := eg.db.Table(tableName).Where("name = ?", name)
