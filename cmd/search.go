@@ -96,9 +96,11 @@ func wrapDate(north, south []string) (string, string) {
 	var s []string
 	for i := 0; i < len(north); i++ {
 		n = append(n, formatDate(north[i]))
+	}
+	for i := 0; i < len(south); i++ {
 		s = append(s, formatDate(south[i]))
 	}
-	return strings.Join(n, " and "), strings.Join(s, " and ")
+	return strings.Join(n, ", "), strings.Join(s, ", ")
 }
 
 // utility func to format dates
@@ -112,9 +114,24 @@ func formatDate(date string) string {
 	}
 	var dateS []string
 	for i := 0; i < len(d); i++ {
+		if contains(dateS, getMonth(d[i])) {
+			continue
+		}
 		dateS = append(dateS, getMonth(d[i]))
 	}
 	return strings.Join(dateS, " to ")
+}
+
+// Helper func
+//
+// contains returns true if a string is found inside a string slice
+func contains(c []string, want string) bool {
+	for _, e := range c {
+		if e == want {
+			return true
+		}
+	}
+	return false
 }
 
 // helper func to return a month name in string format

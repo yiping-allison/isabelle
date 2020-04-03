@@ -7,8 +7,9 @@ south_start character varying(255),
 south_end character varying(255),
 time_of_day character varying(255),
 location character varying(255),
-image character varying(255)
+image character varying(255),
+type character varying(255)
 );
 
-COPY bug_and_fish (name, sell_price, north_start, north_end, south_start, south_end, time_of_day, location, image) 
+COPY bug_and_fish (name, sell_price, north_start, north_end, south_start, south_end, time_of_day, location, image, type) 
 FROM 'C:\Users\yipin\go\src\github.com\yiping-allison\daisymae\data.csv' DELIMITER ',' CSV HEADER;

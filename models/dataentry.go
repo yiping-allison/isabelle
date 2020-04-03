@@ -23,6 +23,7 @@ type Entry struct {
 	Time      string `gorm:"type:varchar(255);column:time_of_day"`
 	Location  string `gorm:"type:varchar(255);column:location"`
 	Image     string `gorm:"type:varchar(255);column:image"`
+	Type      string `gorm:"type:varchar(255);column:type"`
 }
 
 type EntryService interface {
