@@ -18,12 +18,12 @@ import (
 //
 // CmdOps: the full slice of commands (unparsed)
 //
-// CmdHlp: contains the command's help string
+// CmdList: contains the names of all commands
 type CommandInfo struct {
 	Ses     *discordgo.Session
 	Msg     *discordgo.MessageCreate
 	Service models.Services
 	CmdName string
 	CmdOps  []string
-	CmdHlp  string
+	CmdList []string
 }

@@ -52,11 +52,15 @@ func Search(cmdInfo CommandInfo) {
 			Name:  "Time",
 			Value: removeUnderscore(entry.Time),
 		}
+		emLocation := &discordgo.MessageEmbedField{
+			Name:  "Location",
+			Value: removeUnderscore(entry.Location),
+		}
 		emMsg := &discordgo.MessageEmbed{
 			Title:       searchItem,
-			Description: removeUnderscore(entry.Location),
+			Description: strings.Title(entry.Type),
 			Thumbnail:   emThumb,
-			Fields:      []*discordgo.MessageEmbedField{emPrice, emTime, emHemiNorth, emHemiSouth},
+			Fields:      []*discordgo.MessageEmbedField{emLocation, emPrice, emTime, emHemiNorth, emHemiSouth},
 		}
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 	}

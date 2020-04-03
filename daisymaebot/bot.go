@@ -24,11 +24,11 @@ type Bot struct {
 // empty bot and err upon failure
 func New(bc string) (*Bot, error) {
 	if bc == "" {
-		return &Bot{}, errors.New("daisymaebot: you need to input a botKey in the .config file")
+		return nil, errors.New("daisymaebot: you need to input a botKey in the .config file")
 	}
 	discord, err := discordgo.New("Bot " + bc)
 	if err != nil {
-		return &Bot{}, errors.New("daisymaebot: error connecting to discord")
+		return nil, errors.New("daisymaebot: error connecting to discord")
 	}
 	// Commands Setup
 	cmds := make(map[string]Command, 0)
@@ -58,8 +58,7 @@ func (b *Bot) handleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 // Command represents a discord bot command
 type Command struct {
-	Cmd  func(cmd.CommandInfo)
-	Help string
+	Cmd func(cmd.CommandInfo)
 }
 
 // processCmd attemps to process any string that is prefixed with bot notifier
@@ -78,23 +77,17 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if res == nil {
 		return
 	}
+	var commands []string
+	for key := range b.Commands {
+		commands = append(commands, key)
+	}
 	ci := cmd.CommandInfo{
 		Ses:     s,
 		Msg:     m,
 		Service: b.Service,
 		CmdName: trim,
 		CmdOps:  cmds,
-		CmdHlp:  res.Help,
-	}
-	if trim == "help" && len(cmds) > 1 {
-		// if command given is a help command
-		ci.CmdName = strings.Join(cmds[1:], " ")
-		tmp := b.find(ci.CmdName)
-		if tmp == nil {
-			ci.CmdHlp = "This command does not exist."
-		} else {
-			ci.CmdHlp = b.find(ci.CmdName).Help
-		}
+		CmdList: commands,
 	}
 	// Run command
 	res.Cmd(ci)
@@ -113,25 +106,21 @@ func (b *Bot) find(name string) *Command {
 
 // compileCommands contains all commands the bot should add to the bot command map
 func (b *Bot) compileCommands() {
-	b.addCommand("search", `Search for an insect or fish in the database
-		Example:
-		?search Tarantula`, cmd.Search)
-	b.addCommand("help", `Look up how to use a command
-		Example:
-		?help search`, cmd.Help)
-	b.addCommand("ping", "Tells the bot to ping", cmd.Ping)
-	b.addCommand("pong", "Tells bot to respond with ping", cmd.Pong)
+	b.addCommand("search", cmd.Search)
+	b.addCommand("help", cmd.Help)
+	b.addCommand("list", cmd.List)
+	b.addCommand("ping", cmd.Ping)
+	b.addCommand("pong", cmd.Pong)
 }
 
 // utility func to add command to bot command map
-func (b *Bot) addCommand(name, help string, cmd func(cmd.CommandInfo)) {
+func (b *Bot) addCommand(name string, cmd func(cmd.CommandInfo)) {
 	if _, ok := b.Commands[name]; ok {
 		fmt.Printf("addCommand: %s already exists in the map\n", name)
 		return
 	}
 	command := Command{
-		Cmd:  cmd,
-		Help: help,
+		Cmd: cmd,
 	}
 	b.Commands[name] = command
 }
