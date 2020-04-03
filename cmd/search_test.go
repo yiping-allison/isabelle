@@ -67,3 +67,51 @@ func TestFormatName(t *testing.T) {
 		})
 	}
 }
+
+func TestParseHemi(t *testing.T) {
+	tests := map[string]struct {
+		northSt   string
+		northEnd  string
+		southSt   string
+		southEnd  string
+		wantNorth string
+		wantSouth string
+	}{
+		"simple case": {
+			northSt:   "3",
+			northEnd:  "6",
+			southSt:   "7",
+			southEnd:  "2",
+			wantNorth: "March to June",
+			wantSouth: "July to February",
+		},
+		"split case": {
+			northSt:   "3|9",
+			northEnd:  "4|12",
+			southSt:   "5|1",
+			southEnd:  "8|2",
+			wantNorth: "March to April, September to December",
+			wantSouth: "May to August, January to February",
+		},
+		"single month case": {
+			northSt:   "3|10",
+			northEnd:  "6|10",
+			southSt:   "9|4",
+			southEnd:  "12|4",
+			wantNorth: "March to June, October",
+			wantSouth: "September to December, April",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			gotN, gotS := parseHemi(tc.northSt, tc.northEnd, tc.southSt, tc.southEnd)
+			if gotN != tc.wantNorth {
+				t.Errorf("parseHemi() north = %v; want %v", gotN, tc.wantNorth)
+			}
+			if gotS != tc.wantSouth {
+				t.Errorf("parseHemi() south = %v; want %v", gotS, tc.wantSouth)
+			}
+		})
+	}
+}

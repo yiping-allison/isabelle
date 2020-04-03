@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/yiping-allison/daisymae/models"
 )
 
 // Search will look up a possible insect or fish in the database and display to the user
@@ -30,40 +31,49 @@ func Search(cmdInfo CommandInfo) {
 		}
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 	} else {
+		// TODO: refactor
 		nHemi, sHemi := parseHemi(entry.NorthSt, entry.NorthEnd, entry.SouthSt, entry.SouthEnd)
+		fields := createSearchFields(entry, nHemi, sHemi)
 		emThumb := &discordgo.MessageEmbedThumbnail{
 			URL:    entry.Image,
 			Width:  200,
 			Height: 200,
 		}
-		emPrice := &discordgo.MessageEmbedField{
-			Name:  "Price",
-			Value: strconv.Itoa(entry.SellPrice) + " Bells",
-		}
-		emHemiNorth := &discordgo.MessageEmbedField{
-			Name:  "Northern Hemisphere Months",
-			Value: nHemi,
-		}
-		emHemiSouth := &discordgo.MessageEmbedField{
-			Name:  "Southern Hemisphere Months",
-			Value: sHemi,
-		}
-		emTime := &discordgo.MessageEmbedField{
-			Name:  "Time",
-			Value: removeUnderscore(entry.Time),
-		}
-		emLocation := &discordgo.MessageEmbedField{
-			Name:  "Location",
-			Value: removeUnderscore(entry.Location),
-		}
 		emMsg := &discordgo.MessageEmbed{
 			Title:       searchItem,
 			Description: strings.Title(entry.Type),
 			Thumbnail:   emThumb,
-			Fields:      []*discordgo.MessageEmbedField{emLocation, emPrice, emTime, emHemiNorth, emHemiSouth},
+			Fields:      fields,
 		}
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 	}
+}
+
+// createSearchFields creates MessageEmbedFields and returns them as a slice specifically for
+// search commands
+func createSearchFields(entry *models.Entry, nHemi, sHemi string) []*discordgo.MessageEmbedField {
+	format := func(f ...*discordgo.MessageEmbedField) []*discordgo.MessageEmbedField { return f }
+	emPrice := &discordgo.MessageEmbedField{
+		Name:  "Price",
+		Value: strconv.Itoa(entry.SellPrice) + " Bells",
+	}
+	emHemiNorth := &discordgo.MessageEmbedField{
+		Name:  "Northern Hemisphere Months",
+		Value: nHemi,
+	}
+	emHemiSouth := &discordgo.MessageEmbedField{
+		Name:  "Southern Hemisphere Months",
+		Value: sHemi,
+	}
+	emTime := &discordgo.MessageEmbedField{
+		Name:  "Time",
+		Value: removeUnderscore(entry.Time),
+	}
+	emLocation := &discordgo.MessageEmbedField{
+		Name:  "Location",
+		Value: removeUnderscore(entry.Location),
+	}
+	return format(emPrice, emLocation, emTime, emHemiNorth, emHemiSouth)
 }
 
 // utility func to parse hemisphere data and return as
@@ -94,7 +104,7 @@ func parseHemi(ns, ne, st, se string) (string, string) {
 // utility func which wraps entries where there are multiple
 // location months
 //
-// E.g. May to June AND September to November
+// E.g. May to June, September to November
 func wrapDate(north, south []string) (string, string) {
 	var n []string
 	var s []string
