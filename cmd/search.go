@@ -3,13 +3,20 @@ package cmd
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/yiping-allison/daisymae/models"
 )
 
 // Search will look up a possible insect or fish in the database and display to the user
 func Search(cmdInfo CommandInfo) {
 	if len(cmdInfo.CmdOps) == 1 {
+		return
+	}
+	if strings.ToLower(cmdInfo.CmdOps[1]) == "north" || strings.ToLower(cmdInfo.CmdOps[1]) == "south" {
+		// ByMonth search
+		byMonth(cmdInfo.CmdOps[1:], cmdInfo)
 		return
 	}
 	formatStr := toLowerAndFormat(cmdInfo.CmdOps[1:])
@@ -41,6 +48,33 @@ func Search(cmdInfo CommandInfo) {
 		createFields("Southern Hemisphere", sHemi, false),
 	)
 	prettyPrintSearch(entry.Image, searchItem, strings.Title(entry.Type), fields, cmdInfo)
+}
+
+func byMonth(cmds []string, cmdInfo CommandInfo) {
+	// TODO: Refactor
+	// TODO: Add more filter options
+	imgLink := "https://gerhardinger.org/wp-content/uploads/2017/05/icon-world.png"
+	if len(cmds) == 1 {
+		// No month provided; use default
+		var entries []models.Entry
+		if cmds[0] == "north" {
+			entries = cmdInfo.Service.Entry.ByMonth("north_hemi_months", time.Now().Month().String())
+		} else {
+			entries = cmdInfo.Service.Entry.ByMonth("south_hemi_months", time.Now().Month().String())
+		}
+		var fields []*discordgo.MessageEmbedField
+		for _, val := range entries {
+			fields = append(fields, createFields(strings.Title(val.Type), strings.Title(removeUnderscore(val.Name)), true))
+		}
+		for i := 0; i < len(fields); i += 21 {
+			j := i + 21
+			if j > len(fields) {
+				j = len(fields)
+			}
+			prettyPrintSearch(imgLink, "Search By Hemisphere & Month", strings.Title(cmds[0]), fields[i:j], cmdInfo)
+		}
+		return
+	}
 }
 
 func prettyPrintSearch(img, title, desc string, fields []*discordgo.MessageEmbedField, cmdInfo CommandInfo) {

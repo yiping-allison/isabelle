@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 )
@@ -14,16 +15,18 @@ const (
 // Entry represents a database entry of either an insect or
 // fish in the postgres database
 type Entry struct {
-	Name      string `gorm:"not null"`
-	SellPrice int    `gorm:"column:sell_price"`
-	NorthSt   string `gorm:"type:varchar(255);column:north_start"`
-	NorthEnd  string `gorm:"type:varchar(255);column:north_end"`
-	SouthSt   string `gorm:"type:varchar(255);column:south_start"`
-	SouthEnd  string `gorm:"type:varchar(255);column:south_end"`
-	Time      string `gorm:"type:varchar(255);column:time_of_day"`
-	Location  string `gorm:"type:varchar(255);column:location"`
-	Image     string `gorm:"type:varchar(255);column:image"`
-	Type      string `gorm:"type:varchar(255);column:type"`
+	Name        string `gorm:"not null"`
+	SellPrice   int    `gorm:"column:sell_price"`
+	NorthSt     string `gorm:"type:varchar(255);column:north_start"`
+	NorthEnd    string `gorm:"type:varchar(255);column:north_end"`
+	NorthMonths string `gorm:"type:varchar(255);column:north_hemi_months"`
+	SouthSt     string `gorm:"type:varchar(255);column:south_start"`
+	SouthEnd    string `gorm:"type:varchar(255);column:south_end"`
+	SouthMonths string `gorm:"type:varchar(255);column:south_hemi_months"`
+	Time        string `gorm:"type:varchar(255);column:time_of_day"`
+	Location    string `gorm:"type:varchar(255);column:location"`
+	Image       string `gorm:"type:varchar(255);column:image"`
+	Type        string `gorm:"type:varchar(255);column:type"`
 }
 
 type EntryService interface {
@@ -40,6 +43,7 @@ type EntryService interface {
 // this package
 type EntryDB interface {
 	ByName(name, tableName string) (*Entry, error)
+	ByMonth(colName, month string) []Entry
 	FindLike(name, tableName string) []Entry
 }
 
@@ -99,6 +103,13 @@ func (eg *entryGorm) ByName(name, tableName string) (*Entry, error) {
 		return nil, err
 	}
 	return &entry, nil
+}
+
+func (eg *entryGorm) ByMonth(colName, month string) []Entry {
+	var entries []Entry
+	mon := strings.Title(month[:3])
+	eg.db.Table("bug_and_fish").Where(colName+" LIKE ?", "%"+mon+"%").Find(&entries)
+	return entries
 }
 
 // FindLike will return all entries that are similar to the 'name' variable
