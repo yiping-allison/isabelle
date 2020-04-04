@@ -1,5 +1,6 @@
 # Remove configuration settings
 .config
+server.config
 
 # Remove data
 *.csv

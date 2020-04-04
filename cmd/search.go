@@ -11,7 +11,6 @@ import (
 // Search will look up a possible insect or fish in the database and display to the user
 func Search(cmdInfo CommandInfo) {
 	// TODO: Refactor and Prettier Formatting?
-	// TODO: List out top 3 Like matches in not found option
 	if len(cmdInfo.CmdOps) == 1 {
 		return
 	}
@@ -19,6 +18,13 @@ func Search(cmdInfo CommandInfo) {
 	entry, err := cmdInfo.Service.Entry.ByName(formatStr, "bug_and_fish")
 	searchItem := formatName(cmdInfo.CmdOps[1:])
 	if err != nil {
+		// If item was not found in database
+		word := strings.Split(searchItem, " ")
+		vals := cmdInfo.Service.Entry.FindLike(toLowerAndFormat(word), "bug_and_fish")
+		var fields []*discordgo.MessageEmbedField
+		for _, val := range vals {
+			fields = append(fields, addSuggestion(val))
+		}
 		emThumb := &discordgo.MessageEmbedThumbnail{
 			URL:    "http://static2.wikia.nocookie.net/__cb20131020025649/fantendo/images/b/b2/Sad_Face.png",
 			Width:  100,
@@ -26,12 +32,16 @@ func Search(cmdInfo CommandInfo) {
 		}
 		emMsg := &discordgo.MessageEmbed{
 			Title:       searchItem,
-			Description: "Entry Not Found in Database",
+			Description: "Entry Not Found in Database... Perhaps you meant...?",
 			Thumbnail:   emThumb,
+			Fields:      fields,
+		}
+		if len(fields) == 0 {
+			// If no similar entries were found
+			emMsg.Description = "No similar entries found."
 		}
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 	} else {
-		// TODO: refactor
 		nHemi, sHemi := parseHemi(entry.NorthSt, entry.NorthEnd, entry.SouthSt, entry.SouthEnd)
 		fields := createSearchFields(entry, nHemi, sHemi)
 		emThumb := &discordgo.MessageEmbedThumbnail{
@@ -49,13 +59,24 @@ func Search(cmdInfo CommandInfo) {
 	}
 }
 
+// addSuggestion is a utility func to add suggested alternative into an
+// discord message embed field
+func addSuggestion(entry models.Entry) *discordgo.MessageEmbedField {
+	return &discordgo.MessageEmbedField{
+		Name:   strings.Title(entry.Type),
+		Value:  strings.Title(removeUnderscore((entry.Name))),
+		Inline: true,
+	}
+}
+
 // createSearchFields creates MessageEmbedFields and returns them as a slice specifically for
 // search commands
 func createSearchFields(entry *models.Entry, nHemi, sHemi string) []*discordgo.MessageEmbedField {
 	format := func(f ...*discordgo.MessageEmbedField) []*discordgo.MessageEmbedField { return f }
 	emPrice := &discordgo.MessageEmbedField{
-		Name:  "Price",
-		Value: strconv.Itoa(entry.SellPrice) + " Bells",
+		Name:   "Price",
+		Value:  strconv.Itoa(entry.SellPrice) + " Bells",
+		Inline: true,
 	}
 	emHemiNorth := &discordgo.MessageEmbedField{
 		Name:  "Northern Hemisphere Months",
@@ -70,8 +91,9 @@ func createSearchFields(entry *models.Entry, nHemi, sHemi string) []*discordgo.M
 		Value: removeUnderscore(entry.Time),
 	}
 	emLocation := &discordgo.MessageEmbedField{
-		Name:  "Location",
-		Value: removeUnderscore(entry.Location),
+		Name:   "Location",
+		Value:  removeUnderscore(entry.Location),
+		Inline: true,
 	}
 	return format(emPrice, emLocation, emTime, emHemiNorth, emHemiSouth)
 }
@@ -83,7 +105,7 @@ func parseHemi(ns, ne, st, se string) (string, string) {
 	northEnd := strings.Split(ne, "|")
 	southSt := strings.Split(st, "|")
 	southEnd := strings.Split(se, "|")
-	if len(northSt) == 1 {
+	if len(northSt) == 1 && len(southSt) == 1 {
 		return formatDate(northSt[0] + " " + northEnd[0]), formatDate(southSt[0] + " " + southEnd[0])
 	}
 	var northMonths []string

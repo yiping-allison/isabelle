@@ -3,6 +3,7 @@ package daisymaebot
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -71,7 +72,7 @@ type Command struct {
 //
 // ?search help
 func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
-	cmds := strings.Split(m.Content[len(b.Prefix):], " ")
+	cmds := regexp.MustCompile("\\s+").Split(m.Content[len(b.Prefix):], -1)
 	trim := strings.TrimPrefix(cmds[0], b.Prefix)
 	res := b.find(trim)
 	if res == nil {
@@ -96,7 +97,7 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 // finds a command in the command map
 //
 // If it exists, it returns the Command
-// If not, it returns an empty Command
+// If not, it returns nil
 func (b *Bot) find(name string) *Command {
 	if val, ok := b.Commands[name]; ok {
 		return &val

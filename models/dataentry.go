@@ -40,6 +40,7 @@ type EntryService interface {
 // this package
 type EntryDB interface {
 	ByName(name, tableName string) (*Entry, error)
+	FindLike(name, tableName string) []Entry
 }
 
 type entryGorm struct {
@@ -98,6 +99,17 @@ func (eg *entryGorm) ByName(name, tableName string) (*Entry, error) {
 		return nil, err
 	}
 	return &entry, nil
+}
+
+// FindLike will return all entries that are similar to the 'name' variable
+// passed in
+//
+// It will return a slice of type Entry. This does not handle empty slices, so make
+// sure to check for slice length in calling func
+func (eg *entryGorm) FindLike(name, tableName string) []Entry {
+	var entries []Entry
+	eg.db.Table(tableName).Limit(5).Where("name LIKE ?", "%"+name+"%").Find(&entries)
+	return entries
 }
 
 // first will query using the provided gorm.DB and it will
