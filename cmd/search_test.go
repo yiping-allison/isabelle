@@ -101,6 +101,14 @@ func TestParseHemi(t *testing.T) {
 			wantNorth: "March to June, October",
 			wantSouth: "September to December, April",
 		},
+		"only one month": {
+			northSt:   "3",
+			northEnd:  "3",
+			southSt:   "7",
+			southEnd:  "7",
+			wantNorth: "March",
+			wantSouth: "July",
+		},
 	}
 
 	for name, tc := range tests {

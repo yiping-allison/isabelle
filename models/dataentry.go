@@ -108,7 +108,7 @@ func (eg *entryGorm) ByName(name, tableName string) (*Entry, error) {
 // sure to check for slice length in calling func
 func (eg *entryGorm) FindLike(name, tableName string) []Entry {
 	var entries []Entry
-	eg.db.Table(tableName).Limit(5).Where("name LIKE ?", "%"+name+"%").Find(&entries)
+	eg.db.Table(tableName).Limit(6).Where("name LIKE ?", "%"+name+"%").Find(&entries)
 	return entries
 }
 
