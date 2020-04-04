@@ -11,41 +11,51 @@ import (
 // It prints the help message of a specific bot command using
 // Discord's message embedding
 func Help(cmdInfo CommandInfo) {
-	title := ""
-	desc := ""
-	extraTitle := ""
-	extraText := ""
 	if len(cmdInfo.CmdOps) == 1 {
 		// When user only writes: ?help
-		title = "Error"
-		desc = "You must enter a valid command."
-		extraTitle = "EXAMPLE"
-		extraText = "?help search"
-		prettyPrint(title, desc, extraTitle, extraText, cmdInfo)
+		prettyPrintHelp(
+			"Error",
+			"You must query a valid command.",
+			format(
+				createFields("EXAMPLE", "?help search", true),
+			),
+			cmdInfo,
+		)
 		return
 	}
 	full := strings.Join(cmdInfo.CmdOps[1:], " ")
 	if !find(full, cmdInfo) {
-		title = full
-		desc = "Command not found"
-		extraTitle = "To list out all commands:"
-		extraText = "?list"
-		prettyPrint(title, desc, extraTitle, extraText, cmdInfo)
+		prettyPrintHelp(
+			full,
+			"Command Not Found",
+			format(
+				createFields("To List All Commands:", "?list", true),
+			),
+			cmdInfo,
+		)
 		return
 	}
 	switch full {
 	case "search":
-		title = "Search"
-		desc = "Search will look up an item from New Horizon's bug and fish database."
-		extraTitle = "EXAMPLE"
-		extraText = "?search emperor butterfly or ?search north bugs"
+		prettyPrintHelp(
+			"Search",
+			"Search will look up an item from New Horizon's bug and fish database.",
+			format(
+				createFields("EXAMPLE", "?search emperor butterfly", true),
+				createFields("EXAMPLE", "?search north bugs", true),
+			),
+			cmdInfo,
+		)
 	case "pong":
-		title = "Pong"
-		desc = "Playing with pong."
-		extraTitle = "EXAMPLE"
-		extraText = "?pong"
+		prettyPrintHelp(
+			"Pong",
+			"Playing with pong.",
+			format(
+				createFields("EXAMPLE", "?pong", true),
+			),
+			cmdInfo,
+		)
 	}
-	prettyPrint(title, desc, extraTitle, extraText, cmdInfo)
 }
 
 // find returns true if a specific command name
@@ -60,21 +70,17 @@ func find(ops string, cmdInfo CommandInfo) bool {
 }
 
 // prettyPrint uses discord message embedding to print help messages
-func prettyPrint(title, desc, innerT, innerTxt string, cmdInfo CommandInfo) {
+func prettyPrintHelp(title, desc string, fields []*discordgo.MessageEmbedField, cmdInfo CommandInfo) {
 	emThumb := &discordgo.MessageEmbedThumbnail{
 		URL:    "https://www.bbqguru.com/content/images/manual-bbq-icon.png",
 		Width:  100,
 		Height: 100,
 	}
-	emDes := &discordgo.MessageEmbedField{
-		Name:  innerT,
-		Value: innerTxt,
-	}
 	emMsg := &discordgo.MessageEmbed{
 		Title:       title,
 		Description: desc,
 		Thumbnail:   emThumb,
-		Fields:      []*discordgo.MessageEmbedField{emDes},
+		Fields:      fields,
 	}
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 }

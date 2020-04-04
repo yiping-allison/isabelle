@@ -5,12 +5,10 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/yiping-allison/daisymae/models"
 )
 
 // Search will look up a possible insect or fish in the database and display to the user
 func Search(cmdInfo CommandInfo) {
-	// TODO: Refactor and Prettier Formatting?
 	if len(cmdInfo.CmdOps) == 1 {
 		return
 	}
@@ -18,84 +16,46 @@ func Search(cmdInfo CommandInfo) {
 	entry, err := cmdInfo.Service.Entry.ByName(formatStr, "bug_and_fish")
 	searchItem := formatName(cmdInfo.CmdOps[1:])
 	if err != nil {
-		// If item was not found in database
+		// If entry was not found in database
 		word := strings.Split(searchItem, " ")
 		vals := cmdInfo.Service.Entry.FindLike(toLowerAndFormat(word), "bug_and_fish")
 		var fields []*discordgo.MessageEmbedField
 		for _, val := range vals {
-			fields = append(fields, addSuggestion(val))
+			fields = append(fields, createFields(strings.Title(val.Type), strings.Title(removeUnderscore(val.Name)), true))
 		}
-		emThumb := &discordgo.MessageEmbedThumbnail{
-			URL:    "http://static2.wikia.nocookie.net/__cb20131020025649/fantendo/images/b/b2/Sad_Face.png",
-			Width:  100,
-			Height: 100,
-		}
-		emMsg := &discordgo.MessageEmbed{
-			Title:       searchItem,
-			Description: "Entry Not Found in Database... Perhaps you meant...?",
-			Thumbnail:   emThumb,
-			Fields:      fields,
-		}
+		notFoundImg := "http://static2.wikia.nocookie.net/__cb20131020025649/fantendo/images/b/b2/Sad_Face.png"
 		if len(fields) == 0 {
 			// If no similar entries were found
-			emMsg.Description = "No similar entries found."
+			prettyPrintSearch(notFoundImg, searchItem, "No similar entries found.", fields, cmdInfo)
+			return
 		}
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
-	} else {
-		nHemi, sHemi := parseHemi(entry.NorthSt, entry.NorthEnd, entry.SouthSt, entry.SouthEnd)
-		fields := createSearchFields(entry, nHemi, sHemi)
-		emThumb := &discordgo.MessageEmbedThumbnail{
-			URL:    entry.Image,
-			Width:  200,
-			Height: 200,
-		}
-		emMsg := &discordgo.MessageEmbed{
-			Title:       searchItem,
-			Description: strings.Title(entry.Type),
-			Thumbnail:   emThumb,
-			Fields:      fields,
-		}
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
+		prettyPrintSearch(notFoundImg, searchItem, "Entry Not Found in Database... Perhaps you meant...?", fields, cmdInfo)
+		return
 	}
+	nHemi, sHemi := parseHemi(entry.NorthSt, entry.NorthEnd, entry.SouthSt, entry.SouthEnd)
+	fields := format(
+		createFields("Price", strconv.Itoa(entry.SellPrice)+" Bells", true),
+		createFields("Location", removeUnderscore(entry.Location), true),
+		createFields("Time", removeUnderscore(entry.Time), false),
+		createFields("Northern Hemisphere", nHemi, false),
+		createFields("Southern Hemisphere", sHemi, false),
+	)
+	prettyPrintSearch(entry.Image, searchItem, strings.Title(entry.Type), fields, cmdInfo)
 }
 
-// addSuggestion is a utility func to add suggested alternative into an
-// discord message embed field
-func addSuggestion(entry models.Entry) *discordgo.MessageEmbedField {
-	return &discordgo.MessageEmbedField{
-		Name:   strings.Title(entry.Type),
-		Value:  strings.Title(removeUnderscore((entry.Name))),
-		Inline: true,
+func prettyPrintSearch(img, title, desc string, fields []*discordgo.MessageEmbedField, cmdInfo CommandInfo) {
+	emThumb := &discordgo.MessageEmbedThumbnail{
+		URL:    img,
+		Width:  200,
+		Height: 200,
 	}
-}
-
-// createSearchFields creates MessageEmbedFields and returns them as a slice specifically for
-// search commands
-func createSearchFields(entry *models.Entry, nHemi, sHemi string) []*discordgo.MessageEmbedField {
-	format := func(f ...*discordgo.MessageEmbedField) []*discordgo.MessageEmbedField { return f }
-	emPrice := &discordgo.MessageEmbedField{
-		Name:   "Price",
-		Value:  strconv.Itoa(entry.SellPrice) + " Bells",
-		Inline: true,
+	emMsg := &discordgo.MessageEmbed{
+		Title:       title,
+		Description: desc,
+		Thumbnail:   emThumb,
+		Fields:      fields,
 	}
-	emHemiNorth := &discordgo.MessageEmbedField{
-		Name:  "Northern Hemisphere Months",
-		Value: nHemi,
-	}
-	emHemiSouth := &discordgo.MessageEmbedField{
-		Name:  "Southern Hemisphere Months",
-		Value: sHemi,
-	}
-	emTime := &discordgo.MessageEmbedField{
-		Name:  "Time",
-		Value: removeUnderscore(entry.Time),
-	}
-	emLocation := &discordgo.MessageEmbedField{
-		Name:   "Location",
-		Value:  removeUnderscore(entry.Location),
-		Inline: true,
-	}
-	return format(emPrice, emLocation, emTime, emHemiNorth, emHemiSouth)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 }
 
 // utility func to parse hemisphere data and return as

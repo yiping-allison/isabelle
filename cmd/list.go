@@ -11,34 +11,16 @@ func List(cmdInfo CommandInfo) {
 		Width:  100,
 		Height: 100,
 	}
-	fields := createListFields(cmdInfo)
+	fields := format(
+		createFields("search", "?search [item]", true),
+		createFields("help", "?help [command_name]", false),
+		createFields("ping", "?ping", true),
+		createFields("pong", "?pong", true),
+	)
 	emMsg := &discordgo.MessageEmbed{
 		Title:     "Commands",
 		Thumbnail: emThumb,
 		Fields:    fields,
 	}
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
-}
-
-// createListFields is a helper func which combines custom type MessageEmbedFields
-// into a slice of multiple fields specifically for help commands printing
-func createListFields(cmdInfo CommandInfo) []*discordgo.MessageEmbedField {
-	format := func(f ...*discordgo.MessageEmbedField) []*discordgo.MessageEmbedField { return f }
-	search := &discordgo.MessageEmbedField{
-		Name:  "search",
-		Value: "?search [item]",
-	}
-	help := &discordgo.MessageEmbedField{
-		Name:  "help",
-		Value: "?help [command_name]",
-	}
-	ping := &discordgo.MessageEmbedField{
-		Name:  "ping",
-		Value: "?ping",
-	}
-	pong := &discordgo.MessageEmbedField{
-		Name:  "pong",
-		Value: "?pong",
-	}
-	return format(search, help, ping, pong)
 }
