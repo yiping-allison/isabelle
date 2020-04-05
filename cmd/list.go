@@ -12,10 +12,10 @@ func List(cmdInfo CommandInfo) {
 		Height: 100,
 	}
 	fields := format(
-		createFields("search", "?search [item]", true),
-		createFields("help", "?help [command_name]", false),
-		createFields("ping", "?ping", true),
-		createFields("pong", "?pong", true),
+		createFields("search", cmdInfo.Prefix+"search [item]", true),
+		createFields("help", cmdInfo.Prefix+"help [command_name]", false),
+		createFields("ping", cmdInfo.Prefix+"ping", true),
+		createFields("pong", cmdInfo.Prefix+"pong", true),
 	)
 	emMsg := &discordgo.MessageEmbed{
 		Title:     "Commands",

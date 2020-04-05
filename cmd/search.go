@@ -50,33 +50,71 @@ func Search(cmdInfo CommandInfo) {
 	prettyPrintSearch(entry.Image, searchItem, strings.Title(entry.Type), fields, cmdInfo)
 }
 
+// Utility func which returns true when the given slice
+// contains "bug" or "fish"
+func checkValid(args []string) bool {
+	for _, item := range args {
+		if item == "bug" || item == "fish" {
+			return true
+		}
+	}
+	return false
+}
+
+// byMonth prints out glob searches based on hemisphere, current month, and entry type
+//
+// Default month gathered by Go will depend on local time settings on server.
+//
+// E.g. if your server is on Pacific time and it's the last day of April, there will
+// be a mismatch for someone querying on Australian time
 func byMonth(cmds []string, cmdInfo CommandInfo) {
-	// TODO: Refactor
-	// TODO: Add more filter options
 	imgLink := "https://gerhardinger.org/wp-content/uploads/2017/05/icon-world.png"
-	if len(cmds) == 1 {
-		// No month provided; use default
-		var entries []models.Entry
-		if cmds[0] == "north" {
-			entries = cmdInfo.Service.Entry.ByMonth("north_hemi_months", time.Now().Month().String())
-		} else {
-			entries = cmdInfo.Service.Entry.ByMonth("south_hemi_months", time.Now().Month().String())
-		}
-		var fields []*discordgo.MessageEmbedField
-		for _, val := range entries {
-			fields = append(fields, createFields(strings.Title(val.Type), strings.Title(removeUnderscore(val.Name)), true))
-		}
-		for i := 0; i < len(fields); i += 21 {
-			j := i + 21
-			if j > len(fields) {
-				j = len(fields)
-			}
-			prettyPrintSearch(imgLink, "Search By Hemisphere & Month", strings.Title(cmds[0]), fields[i:j], cmdInfo)
-		}
+	if !checkValid(cmds) {
+		prettyPrintSearch(
+			"http://static2.wikia.nocookie.net/__cb20131020025649/fantendo/images/b/b2/Sad_Face.png",
+			"Error",
+			"Please specify 'bug' or 'fish'",
+			format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"search north fish", true),
+			),
+			cmdInfo,
+		)
 		return
+	}
+	var entries []models.Entry
+	if cmds[0] == "north" {
+		if strings.ToLower(cmds[1]) == "bug" {
+			entries = cmdInfo.Service.Entry.ByMonth("north_hemi_months", time.Now().Month().String(), "bug")
+		} else {
+			entries = cmdInfo.Service.Entry.ByMonth("north_hemi_months", time.Now().Month().String(), "fish")
+		}
+	} else {
+		if strings.ToLower(cmds[1]) == "bug" {
+			entries = cmdInfo.Service.Entry.ByMonth("south_hemi_months", time.Now().Month().String(), "bug")
+		} else {
+			entries = cmdInfo.Service.Entry.ByMonth("south_hemi_months", time.Now().Month().String(), "fish")
+		}
+	}
+	var fields []*discordgo.MessageEmbedField
+	for _, val := range entries {
+		fields = append(fields, createFields(strings.Title(removeUnderscore(val.Location)), strings.Title(removeUnderscore(val.Name)), true))
+	}
+	massPrint(fields, imgLink, "Search By Hemisphere & Current Month", strings.Title(cmds[0]), cmdInfo)
+}
+
+// massPrints splits large slices into separate discord embed print statements specifically
+// for search results
+func massPrint(fields []*discordgo.MessageEmbedField, imgLink, title, desc string, cmdInfo CommandInfo) {
+	for i := 0; i < len(fields); i += 21 {
+		j := i + 21
+		if j > len(fields) {
+			j = len(fields)
+		}
+		prettyPrintSearch(imgLink, title, desc, fields[i:j], cmdInfo)
 	}
 }
 
+// Print search results elegantly using discord embeds
 func prettyPrintSearch(img, title, desc string, fields []*discordgo.MessageEmbedField, cmdInfo CommandInfo) {
 	emThumb := &discordgo.MessageEmbedThumbnail{
 		URL:    img,

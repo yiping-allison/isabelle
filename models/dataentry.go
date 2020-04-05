@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	ErrNameRequired = "models: name is required"
-	ErrNotFound     = "models: entry not found"
+	// ErrNotFound is returned when a record isn't found in the Entry database
+	ErrNotFound = "models: entry not found"
 )
 
 // Entry represents a database entry of either an insect or
@@ -29,6 +29,7 @@ type Entry struct {
 	Type        string `gorm:"type:varchar(255);column:type"`
 }
 
+// EntryService handles interactions with the bug and fish (Entry) database
 type EntryService interface {
 	EntryDB
 }
@@ -43,7 +44,7 @@ type EntryService interface {
 // this package
 type EntryDB interface {
 	ByName(name, tableName string) (*Entry, error)
-	ByMonth(colName, month string) []Entry
+	ByMonth(colName, month, entryType string) []Entry
 	FindLike(name, tableName string) []Entry
 }
 
@@ -55,40 +56,16 @@ type entryService struct {
 	EntryDB
 }
 
-type entryValidator struct {
-	EntryDB
-}
-
 // Internal check if we're correctly implementing interface
 var _ EntryDB = &entryGorm{}
 
 // NewEntryService creates a new service to data entry database
 func NewEntryService(db *gorm.DB) EntryService {
 	return &entryService{
-		EntryDB: &entryValidator{
-			EntryDB: &entryGorm{
-				db: db,
-			},
+		EntryDB: &entryGorm{
+			db: db,
 		},
 	}
-}
-
-type entryValFn func(*Entry) error
-
-func runEntryValFns(entry *Entry, fns ...entryValFn) error {
-	for _, fn := range fns {
-		if err := fn(entry); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (ev *entryValidator) hasName(e *Entry) error {
-	if e.Name == "" {
-		return errors.New(ErrNameRequired)
-	}
-	return nil
 }
 
 // ByName looks up an entry by its name and returns the entry
@@ -105,10 +82,17 @@ func (eg *entryGorm) ByName(name, tableName string) (*Entry, error) {
 	return &entry, nil
 }
 
-func (eg *entryGorm) ByMonth(colName, month string) []Entry {
+// ByMonth will look up entries from the bug and fish database by hemisphere,
+// month, and entry type (either bug or fish)
+//
+// It will return all entries which match the criterion.
+//
+// This function will not handle empty slices, so make sure to check for it
+// in calling func
+func (eg *entryGorm) ByMonth(colName, month, entryType string) []Entry {
 	var entries []Entry
 	mon := strings.Title(month[:3])
-	eg.db.Table("bug_and_fish").Where(colName+" LIKE ?", "%"+mon+"%").Find(&entries)
+	eg.db.Table("bug_and_fish").Where(colName+" LIKE ? AND type = ?", "%"+mon+"%", entryType).Find(&entries)
 	return entries
 }
 

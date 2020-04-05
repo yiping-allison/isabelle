@@ -23,6 +23,7 @@ type CommandInfo struct {
 	Ses     *discordgo.Session
 	Msg     *discordgo.MessageCreate
 	Service models.Services
+	Prefix  string
 	CmdName string
 	CmdOps  []string
 	CmdList []string

@@ -41,8 +41,15 @@ func New(bc string) (*Bot, error) {
 	}
 	daisy.compileCommands()
 	// Add Handlers
+	daisy.DS.AddHandler(daisy.ready)
 	daisy.DS.AddHandler(daisy.handleMessage)
 	return daisy, nil
+}
+
+// ready will update bot status after bot receives "ready" event from
+// discord
+func (b *Bot) ready(s *discordgo.Session, r *discordgo.Ready) {
+	s.UpdateStatus(0, b.Prefix+"list")
 }
 
 // handleMessage handles all new discord messages which the bot uses to determine
@@ -86,6 +93,7 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 		Ses:     s,
 		Msg:     m,
 		Service: b.Service,
+		Prefix:  b.Prefix,
 		CmdName: trim,
 		CmdOps:  cmds,
 		CmdList: commands,

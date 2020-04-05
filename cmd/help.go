@@ -17,7 +17,7 @@ func Help(cmdInfo CommandInfo) {
 			"Error",
 			"You must query a valid command.",
 			format(
-				createFields("EXAMPLE", "?help search", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"help search", true),
 			),
 			cmdInfo,
 		)
@@ -29,20 +29,30 @@ func Help(cmdInfo CommandInfo) {
 			full,
 			"Command Not Found",
 			format(
-				createFields("To List All Commands:", "?list", true),
+				createFields("To List All Commands:", cmdInfo.Prefix+"list", true),
 			),
 			cmdInfo,
 		)
 		return
 	}
+	// Valid commands
 	switch full {
 	case "search":
 		prettyPrintHelp(
 			"Search",
 			"Search will look up an item from New Horizon's bug and fish database.",
 			format(
-				createFields("EXAMPLE", "?search emperor butterfly", true),
-				createFields("EXAMPLE", "?search north bugs", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"search emperor butterfly", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"search north bug", true),
+			),
+			cmdInfo,
+		)
+	case "list":
+		prettyPrintHelp(
+			"List",
+			"List will show all commands the bot understands.",
+			format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"list", true),
 			),
 			cmdInfo,
 		)
@@ -51,7 +61,7 @@ func Help(cmdInfo CommandInfo) {
 			"Pong",
 			"Playing with pong.",
 			format(
-				createFields("EXAMPLE", "?pong", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"pong", true),
 			),
 			cmdInfo,
 		)
