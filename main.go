@@ -17,8 +17,6 @@ func main() {
 		fmt.Printf("error loading config; err = %s\n", err)
 		return
 	}
-	// TODO: Implement database connection
-	// TODO: Test database connection
 	dbCfg := bc.Database
 	services, err := models.NewServices(
 		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),

@@ -30,13 +30,12 @@ func Search(cmdInfo CommandInfo) {
 		for _, val := range vals {
 			fields = append(fields, createFields(strings.Title(val.Type), strings.Title(removeUnderscore(val.Name)), true))
 		}
-		notFoundImg := "http://static2.wikia.nocookie.net/__cb20131020025649/fantendo/images/b/b2/Sad_Face.png"
 		if len(fields) == 0 {
 			// If no similar entries were found
-			prettyPrintSearch(notFoundImg, searchItem, "No similar entries found.", fields, cmdInfo, 14886454)
+			cmdInfo.createMsgEmbed(searchItem, errThumbURL, "No similar entries found.", errColor, fields)
 			return
 		}
-		prettyPrintSearch(notFoundImg, searchItem, "Entry Not Found in Database... Perhaps you meant...?", fields, cmdInfo, 14886454)
+		cmdInfo.createMsgEmbed(searchItem, errThumbURL, "Entry Not Found in Database... Perhaps you meant...?", errColor, fields)
 		return
 	}
 	nHemi, sHemi := parseHemi(entry.NorthSt, entry.NorthEnd, entry.SouthSt, entry.SouthEnd)
@@ -47,7 +46,7 @@ func Search(cmdInfo CommandInfo) {
 		createFields("Northern Hemisphere", nHemi, false),
 		createFields("Southern Hemisphere", sHemi, false),
 	)
-	prettyPrintSearch(entry.Image, searchItem, strings.Title(entry.Type), fields, cmdInfo, 9526403)
+	cmdInfo.createMsgEmbed(searchItem, entry.Image, strings.Title(entry.Type), searchColor, fields)
 }
 
 // Utility func which returns true when the given slice
@@ -68,18 +67,9 @@ func checkValid(args []string) bool {
 // E.g. if your server is on Pacific time and it's the last day of April, there will
 // be a mismatch for someone querying on Australian time
 func byMonth(cmds []string, cmdInfo CommandInfo) {
-	imgLink := "https://gerhardinger.org/wp-content/uploads/2017/05/icon-world.png"
 	if !checkValid(cmds) {
-		prettyPrintSearch(
-			"http://static2.wikia.nocookie.net/__cb20131020025649/fantendo/images/b/b2/Sad_Face.png",
-			"Error",
-			"Please specify 'bug' or 'fish'",
-			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"search north fish", true),
-			),
-			cmdInfo,
-			14886454,
-		)
+		cmdInfo.createMsgEmbed("Error", errThumbURL, "Please specify 'bug' or 'fish'", errColor,
+			format(createFields("EXAMPLE", cmdInfo.Prefix+"search south fish", true)))
 		return
 	}
 	var entries []models.Entry
@@ -100,36 +90,19 @@ func byMonth(cmds []string, cmdInfo CommandInfo) {
 	for _, val := range entries {
 		fields = append(fields, createFields(strings.Title(removeUnderscore(val.Location)), strings.Title(removeUnderscore(val.Name)), true))
 	}
-	massPrint(fields, imgLink, "Search By Hemisphere & Current Month", strings.Title(cmds[0]), cmdInfo)
+	massPrint(fields, "Search By Hemisphere & Current Month", strings.Title(cmds[0]), cmdInfo)
 }
 
 // massPrints splits large slices into separate discord embed print statements specifically
 // for search results
-func massPrint(fields []*discordgo.MessageEmbedField, imgLink, title, desc string, cmdInfo CommandInfo) {
+func massPrint(fields []*discordgo.MessageEmbedField, title, desc string, cmdInfo CommandInfo) {
 	for i := 0; i < len(fields); i += 21 {
 		j := i + 21
 		if j > len(fields) {
 			j = len(fields)
 		}
-		prettyPrintSearch(imgLink, title, desc, fields[i:j], cmdInfo, 9526403)
+		cmdInfo.createMsgEmbed(title, blobSThumbURL, desc, searchColor, fields[i:j])
 	}
-}
-
-// Print search results elegantly using discord embeds
-func prettyPrintSearch(img, title, desc string, fields []*discordgo.MessageEmbedField, cmdInfo CommandInfo, color int) {
-	emThumb := &discordgo.MessageEmbedThumbnail{
-		URL:    img,
-		Width:  200,
-		Height: 200,
-	}
-	emMsg := &discordgo.MessageEmbed{
-		Title:       title,
-		Description: desc,
-		Thumbnail:   emThumb,
-		Fields:      fields,
-		Color:       color,
-	}
-	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 }
 
 // utility func to parse hemisphere data and return as
