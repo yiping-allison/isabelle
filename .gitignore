@@ -3,7 +3,7 @@
 server.config
 
 # Remove data
-*.csv
+old_data.csv
 
 # Remove executables
 *.exe

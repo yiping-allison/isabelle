@@ -14,4 +14,4 @@ type character varying(255)
 );
 
 COPY bug_and_fish (name, sell_price, north_start, north_end, north_hemi_months, south_start, south_end, south_hemi_months, time_of_day, location, image, type) 
-FROM 'C:\Users\yipin\go\src\github.com\yiping-allison\daisymae\data.csv' DELIMITER ',' CSV HEADER;
+FROM '[filepath here]' DELIMITER ',' CSV HEADER;
