@@ -20,6 +20,7 @@ func Help(cmdInfo CommandInfo) {
 				createFields("EXAMPLE", cmdInfo.Prefix+"help search", true),
 			),
 			cmdInfo,
+			14886454,
 		)
 		return
 	}
@@ -32,6 +33,7 @@ func Help(cmdInfo CommandInfo) {
 				createFields("To List All Commands:", cmdInfo.Prefix+"list", true),
 			),
 			cmdInfo,
+			14886454,
 		)
 		return
 	}
@@ -46,6 +48,7 @@ func Help(cmdInfo CommandInfo) {
 				createFields("EXAMPLE", cmdInfo.Prefix+"search north bug", true),
 			),
 			cmdInfo,
+			9410425,
 		)
 	case "list":
 		prettyPrintHelp(
@@ -55,6 +58,7 @@ func Help(cmdInfo CommandInfo) {
 				createFields("EXAMPLE", cmdInfo.Prefix+"list", true),
 			),
 			cmdInfo,
+			9410425,
 		)
 	case "pong":
 		prettyPrintHelp(
@@ -64,6 +68,7 @@ func Help(cmdInfo CommandInfo) {
 				createFields("EXAMPLE", cmdInfo.Prefix+"pong", true),
 			),
 			cmdInfo,
+			9410425,
 		)
 	}
 }
@@ -80,7 +85,7 @@ func find(ops string, cmdInfo CommandInfo) bool {
 }
 
 // prettyPrint uses discord message embedding to print help messages
-func prettyPrintHelp(title, desc string, fields []*discordgo.MessageEmbedField, cmdInfo CommandInfo) {
+func prettyPrintHelp(title, desc string, fields []*discordgo.MessageEmbedField, cmdInfo CommandInfo, color int) {
 	emThumb := &discordgo.MessageEmbedThumbnail{
 		URL:    "https://www.bbqguru.com/content/images/manual-bbq-icon.png",
 		Width:  100,
@@ -91,6 +96,7 @@ func prettyPrintHelp(title, desc string, fields []*discordgo.MessageEmbedField, 
 		Description: desc,
 		Thumbnail:   emThumb,
 		Fields:      fields,
+		Color:       color,
 	}
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 }

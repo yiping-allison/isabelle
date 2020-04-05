@@ -21,6 +21,7 @@ func List(cmdInfo CommandInfo) {
 		Title:     "Commands",
 		Thumbnail: emThumb,
 		Fields:    fields,
+		Color:     13473141,
 	}
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 }

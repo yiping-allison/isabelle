@@ -33,10 +33,10 @@ func Search(cmdInfo CommandInfo) {
 		notFoundImg := "http://static2.wikia.nocookie.net/__cb20131020025649/fantendo/images/b/b2/Sad_Face.png"
 		if len(fields) == 0 {
 			// If no similar entries were found
-			prettyPrintSearch(notFoundImg, searchItem, "No similar entries found.", fields, cmdInfo)
+			prettyPrintSearch(notFoundImg, searchItem, "No similar entries found.", fields, cmdInfo, 14886454)
 			return
 		}
-		prettyPrintSearch(notFoundImg, searchItem, "Entry Not Found in Database... Perhaps you meant...?", fields, cmdInfo)
+		prettyPrintSearch(notFoundImg, searchItem, "Entry Not Found in Database... Perhaps you meant...?", fields, cmdInfo, 14886454)
 		return
 	}
 	nHemi, sHemi := parseHemi(entry.NorthSt, entry.NorthEnd, entry.SouthSt, entry.SouthEnd)
@@ -47,7 +47,7 @@ func Search(cmdInfo CommandInfo) {
 		createFields("Northern Hemisphere", nHemi, false),
 		createFields("Southern Hemisphere", sHemi, false),
 	)
-	prettyPrintSearch(entry.Image, searchItem, strings.Title(entry.Type), fields, cmdInfo)
+	prettyPrintSearch(entry.Image, searchItem, strings.Title(entry.Type), fields, cmdInfo, 9526403)
 }
 
 // Utility func which returns true when the given slice
@@ -78,6 +78,7 @@ func byMonth(cmds []string, cmdInfo CommandInfo) {
 				createFields("EXAMPLE", cmdInfo.Prefix+"search north fish", true),
 			),
 			cmdInfo,
+			14886454,
 		)
 		return
 	}
@@ -110,12 +111,12 @@ func massPrint(fields []*discordgo.MessageEmbedField, imgLink, title, desc strin
 		if j > len(fields) {
 			j = len(fields)
 		}
-		prettyPrintSearch(imgLink, title, desc, fields[i:j], cmdInfo)
+		prettyPrintSearch(imgLink, title, desc, fields[i:j], cmdInfo, 9526403)
 	}
 }
 
 // Print search results elegantly using discord embeds
-func prettyPrintSearch(img, title, desc string, fields []*discordgo.MessageEmbedField, cmdInfo CommandInfo) {
+func prettyPrintSearch(img, title, desc string, fields []*discordgo.MessageEmbedField, cmdInfo CommandInfo, color int) {
 	emThumb := &discordgo.MessageEmbedThumbnail{
 		URL:    img,
 		Width:  200,
@@ -126,6 +127,7 @@ func prettyPrintSearch(img, title, desc string, fields []*discordgo.MessageEmbed
 		Description: desc,
 		Thumbnail:   emThumb,
 		Fields:      fields,
+		Color:       color,
 	}
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, emMsg)
 }
