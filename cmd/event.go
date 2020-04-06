@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"bytes"
-	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/yiping-allison/daisymae/models"
 )
 
 type newEvent struct {
@@ -16,10 +18,10 @@ type newEvent struct {
 }
 
 const (
-	diyURL      string = "https://static1.srcdn.com/wordpress/wp-content/uploads/2020/02/Animal-Crossing-New-Horizons-Crafting-Guide.jpg"
-	saharahURL  string = "https://www.imore.com/sites/imore.com/files/styles/large/public/field/image/2020/03/animal-crossing-new-horizons-switch-confirmed-characters-saharah.jpg?itok=iFqeqqRc"
-	celesteURL  string = "https://www.imore.com/sites/imore.com/files/styles/large/public/field/image/2020/03/animal-crossing-new-horizons-switch-confirmed-characters-celeste.jpg?itok=-2ib_Yfs"
-	daisymaeURL string = "https://www.imore.com/sites/imore.com/files/styles/large/public/field/image/2020/03/animal-crossing-new-horizons-switch-confirmed-characters-daisy-mae.jpg?itok=yPB96-2n"
+	diyURL      string = "https://cdn.discordapp.com/attachments/693564368423616562/696635733368111144/DIY.png"
+	saharahURL  string = "https://vignette.wikia.nocookie.net/animalcrossing/images/d/d7/Acnl-saharah.png/revision/latest/scale-to-width-down/344?cb=20130707101048"
+	celesteURL  string = "https://vignette.wikia.nocookie.net/animalcrossing/images/a/a5/Acnl-celeste.png/revision/latest/scale-to-width-down/350?cb=20130703203412"
+	daisymaeURL string = "https://vignette.wikia.nocookie.net/animalcrossing/images/8/85/Daisy_Mae.png/revision/latest?cb=20200220213944"
 )
 
 // Event will parse through event commands and display embed with
@@ -32,6 +34,25 @@ func Event(cmdInfo CommandInfo) {
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy time=\"[Your time]\" msg=\"[Your message]\"", false),
 			))
+		return
+	}
+	if _, err := strconv.Atoi(cmdInfo.CmdOps[1]); err == nil {
+		// This is a list command - print all users in queue
+		if !cmdInfo.Service.Event.EventExists(cmdInfo.CmdOps[1]) {
+			// event doesn't exists - print error
+			msg := cmdInfo.createMsgEmbed(
+				"Error: "+cmdInfo.CmdOps[1]+" Event Does Not Exist", errThumbURL, "Please check your event ID.", errColor,
+				format(
+					createFields("EXAMPLE", cmdInfo.Prefix+"event 1234", false),
+				))
+			cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+			return
+		}
+		queue := cmdInfo.Service.Event.GetQueue(cmdInfo.CmdOps[1])
+		fields := queueToFields(queue)
+		msg := cmdInfo.createMsgEmbed(
+			"Current Queue", queueThumbURL, "Queue ID: "+cmdInfo.CmdOps[1], eventColor, fields)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
 	eventName := strings.ReplaceAll(strings.ToLower(strings.TrimSpace(cmdInfo.CmdOps[1])), " ", "")
@@ -51,42 +72,62 @@ func Event(cmdInfo CommandInfo) {
 	}
 	if event == nil {
 		// Couldn't create an event - error
-		cmdInfo.createMsgEmbed(
+		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "Try checking your command's syntax.", errColor,
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit]\" msg=\"[Your message]\"", false),
 			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
 	if cmdInfo.Service.Event.EventExists(cmdInfo.Msg.ID) {
 		// There's an event with the same ID
-		cmdInfo.createMsgEmbed(
+		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "There is already an event with this ID; Please try again.", errColor,
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit]\" msg=\"[Your message]\"", false),
 			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
 	limit, err := strconv.Atoi(event.Limit)
 	if err != nil {
 		// Error - couldn't convert limit value into a number (limit MUST be a number)
-		cmdInfo.createMsgEmbed(
+		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "Your limit must be a valid number", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit]\" msg=\"[Your message]\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number)]\" msg=\"[Your message]\"", false),
 			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
 	cmdInfo.Service.Event.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14], limit)
-	cmdInfo.createMsgEmbed(
+	msg := cmdInfo.createMsgEmbed(
 		"Event: "+event.Name,
 		event.Img,
-		"To Queue: "+cmdInfo.Msg.ID[10:14],
+		"Queue ID: "+cmdInfo.Msg.ID[10:14],
 		eventColor,
 		format(
+			createFields("Hosted By", cmdInfo.Msg.Author.String(), true),
 			createFields("Limit", event.Limit, true),
 			createFields("Message", event.Msg, false),
 		))
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+}
+
+// queueToFields is specifically made to create field embeds based on variable
+// number to type QueueUser
+func queueToFields(user *[]models.QueueUser) []*discordgo.MessageEmbedField {
+	var f []*discordgo.MessageEmbedField
+	for i, u := range *user {
+		tmp := createFields(
+			"Queue Number: "+strconv.Itoa(i+1),
+			u.DiscordUser.String(),
+			true,
+		)
+		f = append(f, tmp)
+	}
+	return f
 }
 
 // parseCmd will attempt to parse a user's set event command.
@@ -98,7 +139,6 @@ func parseCmd(fullCmd, name, imgURL string) *newEvent {
 	var event newEvent
 	event.Name = name
 	event.Img = imgURL
-	fmt.Println(fullCmd)
 	f := func(c rune) bool {
 		return !unicode.IsLetter(c) && !unicode.IsSpace(c) && !unicode.IsNumber(c)
 	}
@@ -123,7 +163,7 @@ func parseCmd(fullCmd, name, imgURL string) *newEvent {
 
 // validEvent will check if the user set enough fields with valid naming.
 //
-// i.e. a validEvent must have two keywords (ONLY), time and msg
+// i.e. a validEvent must have two keywords (ONLY), limit and msg
 func validEvent(args []string) bool {
 	var set []string
 	for _, e := range args {

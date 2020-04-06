@@ -8,10 +8,9 @@ import (
 
 // Services handles services for bot
 type Services struct {
-	db     *gorm.DB
-	events map[string]EventData
-	Entry  EntryService
-	Event  EventService
+	db    *gorm.DB
+	Entry EntryService
+	Event EventService
 }
 
 // ServicesConfig represents functions that are meant to be running configurations

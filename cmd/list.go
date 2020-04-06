@@ -5,8 +5,11 @@ func List(cmdInfo CommandInfo) {
 	fields := format(
 		createFields("search", cmdInfo.Prefix+"search [item]", true),
 		createFields("help", cmdInfo.Prefix+"help [command_name]", false),
+		createFields("event", cmdInfo.Prefix+"event [arguments]", true),
+		createFields("queue", cmdInfo.Prefix+"queue [event ID]", true),
 		createFields("ping", cmdInfo.Prefix+"ping", true),
 		createFields("pong", cmdInfo.Prefix+"pong", true),
 	)
-	cmdInfo.createMsgEmbed("Commands", listThumbURL, "", listColor, fields)
+	msg := cmdInfo.createMsgEmbed("Commands", listThumbURL, "", listColor, fields)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 }

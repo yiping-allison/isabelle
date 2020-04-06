@@ -15,7 +15,8 @@ type EventService interface {
 type Event interface {
 	AddEvent(User *discordgo.User, MsgID string, limit int)
 	EventExists(msgID string) bool
-	AddToQueue(UserID *discordgo.User, eventID string) error
+	AddToQueue(UserID *discordgo.User, eventID string) (*discordgo.User, error)
+	GetQueue(eventID string) *[]QueueUser
 }
 
 // EventData represents an event a user has created
@@ -69,20 +70,20 @@ func (es eventStore) AddEvent(User *discordgo.User, MsgID string, limit int) {
 // queue is not full
 //
 // REVIEW: Check if this is concurrent safe...
-func (es eventStore) AddToQueue(User *discordgo.User, eventID string) error {
+func (es eventStore) AddToQueue(User *discordgo.User, eventID string) (*discordgo.User, error) {
 	es.m.Lock()
 	defer es.m.Unlock()
 	val := es.eb[eventID]
 	if len(val.Queue) == val.Limit {
-		return errors.New("limit reached")
+		return nil, errors.New("queue limit reached")
 	}
 	if val.DiscordUser.ID == User.ID {
-		return errors.New("you cannot queue for your own event")
+		return nil, errors.New("you cannot queue for your own event")
 	}
 	for _, u := range val.Queue {
 		if u.DiscordUser.ID == User.ID {
 			fmt.Println(u.DiscordUser.ID)
-			return errors.New("user already in queue")
+			return nil, errors.New("user already in queue")
 		}
 	}
 	newUser := QueueUser{
@@ -90,7 +91,15 @@ func (es eventStore) AddToQueue(User *discordgo.User, eventID string) error {
 	}
 	val.Queue = append(val.Queue, newUser)
 	es.eb[eventID].Queue = val.Queue
-	return nil
+	return val.DiscordUser, nil
+}
+
+// GetQueue will return the current queue line
+func (es eventStore) GetQueue(eventID string) *[]QueueUser {
+	es.m.Lock()
+	defer es.m.Unlock()
+	val := es.eb[eventID]
+	return &val.Queue
 }
 
 // NewEventService creates a new Event service
