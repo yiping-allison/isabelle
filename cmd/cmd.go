@@ -10,13 +10,16 @@ const (
 	helpThumbURL  string = "https://www.bbqguru.com/content/images/manual-bbq-icon.png"
 	errThumbURL   string = "http://static2.wikia.nocookie.net/__cb20131020025649/fantendo/images/b/b2/Sad_Face.png"
 	blobSThumbURL string = "https://gerhardinger.org/wp-content/uploads/2017/05/icon-world.png"
+	checkThumbURL string = "http://www.providesupport.com/blog/wp-content/uploads/2013/08/green-check-mark.png"
 )
 
 const (
-	listColor   int = 13473141
-	helpColor   int = 9410425
-	errColor    int = 14886454
-	searchColor int = 9526403
+	listColor    int = 13473141
+	helpColor    int = 9410425
+	errColor     int = 14886454
+	searchColor  int = 9526403
+	eventColor   int = 3108709
+	successColor int = 3764015
 )
 
 // CommandInfo represents all metadata discord and bot needs to
@@ -27,6 +30,8 @@ const (
 // Msg: discord message (discord)
 //
 // Service: contains all services needed by bot (bot)
+//
+// Prefix: the prefix the bot recognizes set in .config
 //
 // CmdName: contains the command name
 //

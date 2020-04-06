@@ -15,6 +15,7 @@ import (
 type Bot struct {
 	DS       *discordgo.Session
 	Service  models.Services
+	Event    []models.EventData
 	Prefix   string
 	Commands map[string]Command
 }
@@ -118,6 +119,8 @@ func (b *Bot) compileCommands() {
 	b.addCommand("search", cmd.Search)
 	b.addCommand("help", cmd.Help)
 	b.addCommand("list", cmd.List)
+	b.addCommand("event", cmd.Event)
+	b.addCommand("queue", cmd.Queue)
 	b.addCommand("ping", cmd.Ping)
 	b.addCommand("pong", cmd.Pong)
 }

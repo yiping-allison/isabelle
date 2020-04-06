@@ -22,6 +22,7 @@ func main() {
 		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
 		models.WithLogMode(true),
 		models.WithEntries(),
+		models.WithEvents(),
 	)
 	if err != nil {
 		fmt.Println(err)

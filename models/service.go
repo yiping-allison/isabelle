@@ -1,13 +1,17 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 // Code in this file adapted from Jon Calhoun
 
 // Services handles services for bot
 type Services struct {
-	db    *gorm.DB
-	Entry EntryService
+	db     *gorm.DB
+	events map[string]EventData
+	Entry  EntryService
+	Event  EventService
 }
 
 // ServicesConfig represents functions that are meant to be running configurations
@@ -42,6 +46,14 @@ func WithGorm(dialect, connectionInfo string) ServicesConfig {
 func WithEntries() ServicesConfig {
 	return func(s *Services) error {
 		s.Entry = NewEntryService(s.db)
+		return nil
+	}
+}
+
+// WithEvents will initialize an events server 'database'
+func WithEvents() ServicesConfig {
+	return func(s *Services) error {
+		s.Event = NewEventService()
 		return nil
 	}
 }
