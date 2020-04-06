@@ -29,11 +29,12 @@ const (
 func Event(cmdInfo CommandInfo) {
 	if len(cmdInfo.CmdOps) == 1 {
 		// No arguments supplied - error
-		cmdInfo.createMsgEmbed(
+		msg := cmdInfo.createMsgEmbed(
 			"Error: No Arguments", errThumbURL, "You must supply arguments to the command.", errColor,
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy time=\"[Your time]\" msg=\"[Your message]\"", false),
 			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
 	if _, err := strconv.Atoi(cmdInfo.CmdOps[1]); err == nil {
@@ -75,7 +76,7 @@ func Event(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "Try checking your command's syntax.", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit]\" msg=\"[Your message]\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message]\"", false),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
@@ -85,18 +86,19 @@ func Event(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "There is already an event with this ID; Please try again.", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit]\" msg=\"[Your message]\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message]\"", false),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
 	limit, err := strconv.Atoi(event.Limit)
-	if err != nil {
+	if err != nil || limit > 20 || limit < 1 {
 		// Error - couldn't convert limit value into a number (limit MUST be a number)
+		// Limit must be within bounds 1 - 20
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "Your limit must be a valid number", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number)]\" msg=\"[Your message]\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message]\"", false),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return

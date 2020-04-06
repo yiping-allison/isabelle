@@ -9,8 +9,6 @@ import (
 // Queue handles the queue-ing system; queue ids are retrieved from
 // event ids defined in event.go
 func Queue(cmdInfo CommandInfo) {
-	// TODO: Add NAMES to queue print messages otherwise no one knows who was rejected
-	// or accepted to queue
 	if len(cmdInfo.CmdOps) == 1 {
 		// Not enough arguments: only ;queue
 		msg := cmdInfo.createMsgEmbed(

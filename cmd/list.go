@@ -7,6 +7,7 @@ func List(cmdInfo CommandInfo) {
 		createFields("help", cmdInfo.Prefix+"help [command_name]", false),
 		createFields("event", cmdInfo.Prefix+"event [arguments]", true),
 		createFields("queue", cmdInfo.Prefix+"queue [event ID]", true),
+		createFields("close", cmdInfo.Prefix+"close event [event ID]", true),
 		createFields("ping", cmdInfo.Prefix+"ping", true),
 		createFields("pong", cmdInfo.Prefix+"pong", true),
 	)

@@ -17,6 +17,7 @@ type Event interface {
 	EventExists(msgID string) bool
 	AddToQueue(UserID *discordgo.User, eventID string) (*discordgo.User, error)
 	GetQueue(eventID string) *[]QueueUser
+	Close(eventID string)
 }
 
 // EventData represents an event a user has created
@@ -100,6 +101,13 @@ func (es eventStore) GetQueue(eventID string) *[]QueueUser {
 	defer es.m.Unlock()
 	val := es.eb[eventID]
 	return &val.Queue
+}
+
+// Close will remove a event listing from the map
+func (es eventStore) Close(eventID string) {
+	es.m.Lock()
+	defer es.m.Unlock()
+	delete(es.eb, eventID)
 }
 
 // NewEventService creates a new Event service

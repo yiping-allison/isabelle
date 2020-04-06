@@ -11,6 +11,7 @@ import (
 func Help(cmdInfo CommandInfo) {
 	if len(cmdInfo.CmdOps) == 1 {
 		// When user only writes: ?help
+		// No valid command input
 		msg := cmdInfo.createMsgEmbed("Error", errThumbURL, "You must query a valid command",
 			errColor, format(createFields("EXAMPLE", cmdInfo.Prefix+"help search", true)))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
@@ -18,6 +19,7 @@ func Help(cmdInfo CommandInfo) {
 	}
 	full := strings.Join(cmdInfo.CmdOps[1:], " ")
 	if !find(full, cmdInfo) {
+		// Command not found
 		msg := cmdInfo.createMsgEmbed(full, errThumbURL, "Command Not Found", errColor, format(
 			createFields("To List All Commands: ", cmdInfo.Prefix+"list", true),
 		))
@@ -44,6 +46,12 @@ func Help(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed("Queue", helpThumbURL, "Queue handles the queue creation service (paired with events) to join visitation events.",
 			helpColor, format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"queue 1234", true),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+	case "close":
+		msg := cmdInfo.createMsgEmbed("Close", helpThumbURL, "Ends events.",
+			helpColor, format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"close event 1234", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 	case "list":
