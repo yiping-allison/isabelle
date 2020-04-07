@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	daisy, err := daisymaebot.New(bc.BotKey)
+	daisy, err := daisymaebot.New(bc.BotKey, bc.AdminRole)
 	if err != nil {
 		fmt.Printf("%s", err)
 		return

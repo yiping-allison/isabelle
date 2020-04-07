@@ -20,7 +20,7 @@ type Event interface {
 	EventExists(msgID string) bool
 	AddToQueue(UserID *discordgo.User, eventID string) (*discordgo.User, error)
 	GetQueue(eventID string) *[]QueueUser
-	Close(eventID string)
+	Close(eventID, role string, user *discordgo.User, roles []string) error
 	Clean()
 }
 
@@ -110,10 +110,25 @@ func (es eventStore) GetQueue(eventID string) *[]QueueUser {
 }
 
 // Close will remove a event listing from the map
-func (es eventStore) Close(eventID string) {
+func (es eventStore) Close(eventID, role string, user *discordgo.User, roles []string) error {
 	es.m.Lock()
 	defer es.m.Unlock()
+	if !containsRole(role, roles) && es.eb[eventID].DiscordUser.ID != user.ID {
+		return errors.New("permission denied")
+	}
 	delete(es.eb, eventID)
+	return nil
+}
+
+// containsRole will check if a supplied role ID which controls bot matches the list of role ids
+// a member has
+func containsRole(item string, container []string) bool {
+	for _, r := range container {
+		if item == r {
+			return true
+		}
+	}
+	return false
 }
 
 // Clean will remove event listings from the map that have exceeded time limit

@@ -13,31 +13,33 @@ import (
 
 // Bot represents a daisymae bot instance
 type Bot struct {
-	DS       *discordgo.Session
-	Service  models.Services
-	Prefix   string
-	Commands map[string]Command
+	AdminRole string
+	DS        *discordgo.Session
+	Service   models.Services
+	Prefix    string
+	Commands  map[string]Command
 }
 
 // New creates a new daisymae bot instance and loads bot commands.
 //
 // It will return the finished bot and nil upon success or
 // empty bot and err upon failure
-func New(bc string) (*Bot, error) {
-	if bc == "" {
+func New(botKey, admin string) (*Bot, error) {
+	if botKey == "" {
 		return nil, errors.New("daisymaebot: you need to input a botKey in the .config file")
 	}
-	discord, err := discordgo.New("Bot " + bc)
+	discord, err := discordgo.New("Bot " + botKey)
 	if err != nil {
 		return nil, errors.New("daisymaebot: error connecting to discord")
 	}
 	// Commands Setup
 	cmds := make(map[string]Command, 0)
 	daisy := &Bot{
-		Prefix:   "?",
-		DS:       discord,
-		Service:  models.Services{},
-		Commands: cmds,
+		AdminRole: admin,
+		Prefix:    "?",
+		DS:        discord,
+		Service:   models.Services{},
+		Commands:  cmds,
 	}
 	daisy.compileCommands()
 	// Add Handlers
@@ -90,13 +92,14 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 		commands = append(commands, key)
 	}
 	ci := cmd.CommandInfo{
-		Ses:     s,
-		Msg:     m,
-		Service: b.Service,
-		Prefix:  b.Prefix,
-		CmdName: trim,
-		CmdOps:  cmds,
-		CmdList: commands,
+		AdminRole: b.AdminRole,
+		Ses:       s,
+		Msg:       m,
+		Service:   b.Service,
+		Prefix:    b.Prefix,
+		CmdName:   trim,
+		CmdOps:    cmds,
+		CmdList:   commands,
 	}
 	// Run command
 	res.Cmd(ci)
