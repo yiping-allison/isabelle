@@ -12,7 +12,7 @@ func Help(cmdInfo CommandInfo) {
 	if len(cmdInfo.CmdOps) == 1 {
 		// When user only writes: ?help
 		// No valid command input
-		msg := cmdInfo.createMsgEmbed("Error", errThumbURL, "You must query a valid command",
+		msg := cmdInfo.createMsgEmbed("Error", errThumbURL, "You must enter a valid command",
 			errColor, format(createFields("EXAMPLE", cmdInfo.Prefix+"help search", true)))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
@@ -29,21 +29,21 @@ func Help(cmdInfo CommandInfo) {
 	// Valid commands
 	switch full {
 	case "search":
-		msg := cmdInfo.createMsgEmbed("Search", helpThumbURL, "Search will look up an item from New Horizon's bug and fish database.",
+		msg := cmdInfo.createMsgEmbed("Search", helpThumbURL, "Looks up an item from bug and fish database.",
 			helpColor, format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"search emperor butterfly", true),
 				createFields("EXAMPLE", cmdInfo.Prefix+"search north bug", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 	case "event":
-		msg := cmdInfo.createMsgEmbed("Event", helpThumbURL, "Event handles the event creation service (paired with queue-ing) to host visitation events.",
+		msg := cmdInfo.createMsgEmbed("Event", helpThumbURL, "Creates visitation events.",
 			helpColor, format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event celeste limit=\"2\" msg=\"Come on over for shooting stars!\"", false),
 				createFields("EXAMPLE", cmdInfo.Prefix+"event 1234", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 	case "queue":
-		msg := cmdInfo.createMsgEmbed("Queue", helpThumbURL, "Queue handles the queue creation service (paired with events) to join visitation events.",
+		msg := cmdInfo.createMsgEmbed("Queue", helpThumbURL, "Join a queue for visitation events.",
 			helpColor, format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"queue 1234", true),
 			))
@@ -55,7 +55,7 @@ func Help(cmdInfo CommandInfo) {
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 	case "list":
-		msg := cmdInfo.createMsgEmbed("List", helpThumbURL, "List will show all commands the bot understands.", helpColor,
+		msg := cmdInfo.createMsgEmbed("List", helpThumbURL, "Displays all bot commands.", helpColor,
 			format(createFields("EXAMPLE", cmdInfo.Prefix+"list", true)))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 	case "pong":

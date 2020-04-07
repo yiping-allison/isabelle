@@ -7,7 +7,7 @@ import (
 // Close will attempt to parse event or trade types
 // and close the event by ID through host request
 func Close(cmdInfo CommandInfo) {
-	// Arg at cmdInfo.CmdOps[2] should be specifiying event or trade
+	// Arg at cmdInfo.CmdOps[1] should be specifiying event or trade
 	if len(cmdInfo.CmdOps) != 3 {
 		// wrong arguments - error
 		msg := cmdInfo.createMsgEmbed(

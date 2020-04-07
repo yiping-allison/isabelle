@@ -4,20 +4,24 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
+// EventService is a layer of abstraction leading to the Event interface
 type EventService interface {
 	Event
 }
 
+// Event represents all methods we can use to interact with Event type data
 type Event interface {
 	AddEvent(User *discordgo.User, MsgID string, limit int)
 	EventExists(msgID string) bool
 	AddToQueue(UserID *discordgo.User, eventID string) (*discordgo.User, error)
 	GetQueue(eventID string) *[]QueueUser
 	Close(eventID string)
+	Clean()
 }
 
 // EventData represents an event a user has created
@@ -25,6 +29,7 @@ type EventData struct {
 	DiscordUser *discordgo.User
 	Limit       int
 	Queue       []QueueUser
+	Expiration  time.Time
 }
 
 type eventStore struct {
@@ -63,6 +68,7 @@ func (es eventStore) AddEvent(User *discordgo.User, MsgID string, limit int) {
 		DiscordUser: User,
 		Limit:       limit,
 		Queue:       newQ,
+		Expiration:  time.Now().Add(2 * time.Hour),
 	}
 	es.eb[MsgID] = new
 }
@@ -108,6 +114,21 @@ func (es eventStore) Close(eventID string) {
 	es.m.Lock()
 	defer es.m.Unlock()
 	delete(es.eb, eventID)
+}
+
+// Clean will remove event listings from the map that have exceeded time limit
+//
+// DO NOT CALL THIS RANDOMLY!!
+//
+// This should only be called in the goroutine in main (ticker to check expiration)
+func (es eventStore) Clean() {
+	es.m.Lock()
+	defer es.m.Unlock()
+	for k, v := range es.eb {
+		if time.Now().Sub(v.Expiration) > 0 {
+			delete(es.eb, k)
+		}
+	}
 }
 
 // NewEventService creates a new Event service

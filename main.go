@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/yiping-allison/daisymae/daisymaebot"
@@ -37,6 +38,19 @@ func main() {
 	// daisy.Service.AutoMigrate()
 	defer daisy.Service.Close()
 	daisy.SetPrefix(bc.BotPrefix)
+
+	go func() {
+		// check map and remove anything that expired
+		// every hour (can be changed if you want frequent or longer time interval cleaning)
+		ticker := time.NewTicker(1 * time.Hour)
+		for {
+			select {
+			case <-ticker.C:
+				daisy.Service.Event.Clean()
+			}
+		}
+	}()
+
 	err = daisy.DS.Open()
 	if err != nil {
 		fmt.Printf("Error opening connection; err = %v\n", err)
