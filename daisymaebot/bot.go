@@ -124,6 +124,7 @@ func (b *Bot) compileCommands() {
 	b.addCommand("event", cmd.Event)
 	b.addCommand("queue", cmd.Queue)
 	b.addCommand("close", cmd.Close)
+	b.addCommand("unregister", cmd.Unregister)
 	b.addCommand("ping", cmd.Ping)
 	b.addCommand("pong", cmd.Pong)
 }
