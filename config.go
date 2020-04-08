@@ -11,6 +11,7 @@ type BotConfig struct {
 	BotKey    string         `json:"botKey"`
 	BotPrefix string         `json:"botPrefix"`
 	Database  PostgresConfig `json:"database"`
+	AdminRole string         `json:"adminRole"`
 }
 
 // PostgresConfig represents metadata required to start and maintain postgres

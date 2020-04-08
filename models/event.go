@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -20,8 +19,9 @@ type Event interface {
 	EventExists(msgID string) bool
 	AddToQueue(UserID *discordgo.User, eventID string) (*discordgo.User, error)
 	GetQueue(eventID string) *[]QueueUser
-	Close(eventID string)
+	Close(eventID, role string, user *discordgo.User, roles []string) error
 	Clean()
+	Remove(eventID string, user *discordgo.User)
 }
 
 // EventData represents an event a user has created
@@ -75,8 +75,6 @@ func (es eventStore) AddEvent(User *discordgo.User, MsgID string, limit int) {
 
 // AddToQueue will add another user to the queue who registers as long as the
 // queue is not full
-//
-// REVIEW: Check if this is concurrent safe...
 func (es eventStore) AddToQueue(User *discordgo.User, eventID string) (*discordgo.User, error) {
 	es.m.Lock()
 	defer es.m.Unlock()
@@ -89,7 +87,6 @@ func (es eventStore) AddToQueue(User *discordgo.User, eventID string) (*discordg
 	}
 	for _, u := range val.Queue {
 		if u.DiscordUser.ID == User.ID {
-			fmt.Println(u.DiscordUser.ID)
 			return nil, errors.New("user already in queue")
 		}
 	}
@@ -110,10 +107,45 @@ func (es eventStore) GetQueue(eventID string) *[]QueueUser {
 }
 
 // Close will remove a event listing from the map
-func (es eventStore) Close(eventID string) {
+func (es eventStore) Close(eventID, role string, user *discordgo.User, roles []string) error {
 	es.m.Lock()
 	defer es.m.Unlock()
+	if !containsRole(role, roles) && es.eb[eventID].DiscordUser.ID != user.ID {
+		return errors.New("permission denied")
+	}
 	delete(es.eb, eventID)
+	return nil
+}
+
+// containsRole will check if a supplied role ID which controls bot matches the list of role ids
+// a member has
+func containsRole(item string, container []string) bool {
+	for _, r := range container {
+		if item == r {
+			return true
+		}
+	}
+	return false
+}
+
+// Remove will remove a queue individual from event based on Event ID
+func (es eventStore) Remove(eventID string, user *discordgo.User) {
+	es.m.Lock()
+	defer es.m.Unlock()
+	es.eb[eventID].Queue = removeUser(user, es.eb[eventID].Queue)
+}
+
+// removeUser rebuilds the QueueUser slice without the user wanting
+// to be removed
+func removeUser(rUser *discordgo.User, users []QueueUser) []QueueUser {
+	var nQueue []QueueUser
+	for _, u := range users {
+		if u.DiscordUser.ID == rUser.ID {
+			continue
+		}
+		nQueue = append(nQueue, u)
+	}
+	return nQueue
 }
 
 // Clean will remove event listings from the map that have exceeded time limit

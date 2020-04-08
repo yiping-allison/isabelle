@@ -10,6 +10,7 @@ import (
 func TestNew(t *testing.T) {
 	tests := map[string]struct {
 		bot_key string
+		admin   string
 		want    daisymaebot.Bot
 		err     error
 	}{
@@ -21,7 +22,7 @@ func TestNew(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			bot, err := daisymaebot.New(tc.bot_key)
+			bot, err := daisymaebot.New(tc.bot_key, tc.admin)
 			if err == nil {
 				t.Errorf("New() Need to have error stating user needs BotKey")
 			}

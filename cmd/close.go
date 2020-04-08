@@ -39,11 +39,22 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 		return
 	}
 	// close the event
-	cmdInfo.Service.Event.Close(eventID)
+	err := cmdInfo.Service.Event.Close(eventID, cmdInfo.AdminRole, cmdInfo.Msg.Author, cmdInfo.Msg.Member.Roles)
+	if err != nil {
+		// Permission denied error type
+		msg := cmdInfo.createMsgEmbed(
+			"Error: You do not have permission to delete this event", errThumbURL, "Event ID: "+eventID, errColor,
+			format(
+				createFields("Suggestion", "Try checking if you supplied the right Event ID.", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		return
+	}
 	embed := cmdInfo.createMsgEmbed(
 		"Successfully Removed Event "+eventID+" from listings!", checkThumbURL, "Thank you for hosting!",
 		successColor, format(
 			createFields("Suggestion", "If you are planning on opening another event, it is safe to do so now.", false),
+			createFields("Suggestion", "If your event was deleted by a moderator, please make sure to follow event guidelines.", false),
 		))
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, embed)
 }

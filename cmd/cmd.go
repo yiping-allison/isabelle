@@ -26,6 +26,8 @@ const (
 // CommandInfo represents all metadata discord and bot needs to
 // execute certain API callbacks and commands
 //
+// AdminRole: ID of the role which can control bot
+//
 // Ses: discord session (discord)
 //
 // Msg: discord message (discord)
@@ -40,13 +42,14 @@ const (
 //
 // CmdList: contains the names of all commands
 type CommandInfo struct {
-	Ses     *discordgo.Session
-	Msg     *discordgo.MessageCreate
-	Service models.Services
-	Prefix  string
-	CmdName string
-	CmdOps  []string
-	CmdList []string
+	AdminRole string
+	Ses       *discordgo.Session
+	Msg       *discordgo.MessageCreate
+	Service   models.Services
+	Prefix    string
+	CmdName   string
+	CmdOps    []string
+	CmdList   []string
 }
 
 // format is a utility func which takes in a variadic parameter of discord message embed field

@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	daisy, err := daisymaebot.New(bc.BotKey)
+	daisy, err := daisymaebot.New(bc.BotKey, bc.AdminRole)
 	if err != nil {
 		fmt.Printf("%s", err)
 		return
@@ -41,8 +41,8 @@ func main() {
 
 	go func() {
 		// check map and remove anything that expired
-		// every hour (can be changed if you want frequent or longer time interval cleaning)
-		ticker := time.NewTicker(1 * time.Hour)
+		// every 15 minutes (can be changed if you want frequent or longer time interval cleaning)
+		ticker := time.NewTicker(15 * time.Minute)
 		for {
 			select {
 			case <-ticker.C:
