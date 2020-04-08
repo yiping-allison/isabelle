@@ -18,6 +18,7 @@ func Close(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	t := strings.ToLower(cmdInfo.CmdOps[1])
 	switch t {
 	case "event":
@@ -38,10 +39,11 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	// close the event
 	err := cmdInfo.Service.Event.Close(eventID, cmdInfo.AdminRole, cmdInfo.Msg.Author, cmdInfo.Msg.Member.Roles)
 	if err != nil {
-		// Permission denied error type
+		// Error - Permission denied
 		msg := cmdInfo.createMsgEmbed(
 			"Error: You do not have permission to delete this event", errThumbURL, "Event ID: "+eventID, errColor,
 			format(
@@ -50,6 +52,7 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	embed := cmdInfo.createMsgEmbed(
 		"Successfully Removed Event "+eventID+" from listings!", checkThumbURL, "Thank you for hosting!",
 		successColor, format(

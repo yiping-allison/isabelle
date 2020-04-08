@@ -112,6 +112,17 @@ func Event(cmdInfo CommandInfo) {
 		return
 	}
 
+	if !validMsg(event.Msg, eventName) {
+		// Error - message must be within 50 or 100 characters
+		msg := cmdInfo.createMsgEmbed(
+			"Error: Couldn't Create Event", errThumbURL, "Your message must be within valid length", errColor,
+			format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message (50 chars for all events except Saharah at 100 chars)]\"", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		return
+	}
+
 	cmdInfo.Service.Event.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14], limit)
 	msg := cmdInfo.createMsgEmbed(
 		"Event: "+event.Name,
@@ -124,6 +135,20 @@ func Event(cmdInfo CommandInfo) {
 			createFields("Message", event.Msg, false),
 		))
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+}
+
+// validMsg checks if a message is within text length
+func validMsg(msg, event string) bool {
+	var max int
+	if event == "saharah" {
+		max = 100
+	} else {
+		max = 50
+	}
+	if len([]rune(msg)) > max {
+		return false
+	}
+	return true
 }
 
 // queueToFields is specifically made to create field embeds based on variable
