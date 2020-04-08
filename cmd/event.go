@@ -22,6 +22,7 @@ const (
 	saharahURL  string = "https://vignette.wikia.nocookie.net/animalcrossing/images/d/d7/Acnl-saharah.png/revision/latest/scale-to-width-down/344?cb=20130707101048"
 	celesteURL  string = "https://vignette.wikia.nocookie.net/animalcrossing/images/a/a5/Acnl-celeste.png/revision/latest/scale-to-width-down/350?cb=20130703203412"
 	daisymaeURL string = "https://vignette.wikia.nocookie.net/animalcrossing/images/8/85/Daisy_Mae.png/revision/latest?cb=20200220213944"
+	meteorURL   string = "https://static0.srcdn.com/wordpress/wp-content/uploads/2020/04/animal-crossing-new-horizon-meteor-shower.jpg"
 )
 
 // Event will parse through event commands and display embed with
@@ -37,6 +38,7 @@ func Event(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	if _, err := strconv.Atoi(cmdInfo.CmdOps[1]); err == nil {
 		// This is a list command - print all users in queue
 		if !cmdInfo.Service.Event.EventExists(cmdInfo.CmdOps[1]) {
@@ -56,6 +58,7 @@ func Event(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	eventName := strings.ReplaceAll(strings.ToLower(strings.TrimSpace(cmdInfo.CmdOps[1])), " ", "")
 	cmd := strings.Join(cmdInfo.CmdOps[2:], " ")
 	var event *newEvent
@@ -68,9 +71,12 @@ func Event(cmdInfo CommandInfo) {
 		event = parseCmd(cmd, "Saharah", saharahURL)
 	case "diy":
 		event = parseCmd(cmd, "DIY", diyURL)
+	case "meteor":
+		event = parseCmd(cmd, "Meteor Shower", meteorURL)
 	default:
 		return
 	}
+
 	if event == nil {
 		// Couldn't create an event - error
 		msg := cmdInfo.createMsgEmbed(
@@ -81,6 +87,7 @@ func Event(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	if cmdInfo.Service.Event.EventExists(cmdInfo.Msg.ID) {
 		// There's an event with the same ID
 		msg := cmdInfo.createMsgEmbed(
@@ -91,6 +98,7 @@ func Event(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	limit, err := strconv.Atoi(event.Limit)
 	if err != nil || limit > 20 || limit < 1 {
 		// Error - couldn't convert limit value into a number (limit MUST be a number)
@@ -103,6 +111,7 @@ func Event(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	cmdInfo.Service.Event.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14], limit)
 	msg := cmdInfo.createMsgEmbed(
 		"Event: "+event.Name,

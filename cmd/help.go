@@ -38,7 +38,7 @@ func Help(cmdInfo CommandInfo) {
 	case "event":
 		msg := cmdInfo.createMsgEmbed("Event", helpThumbURL, "Creates visitation events.",
 			helpColor, format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event celeste limit=\"2\" msg=\"Come on over for shooting stars!\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event celeste limit=\"2\" msg=\"Come on over for shooting stars\"", false),
 				createFields("EXAMPLE", cmdInfo.Prefix+"event 1234", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
