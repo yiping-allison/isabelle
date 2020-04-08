@@ -11,6 +11,7 @@ type Services struct {
 	db    *gorm.DB
 	Entry EntryService
 	Event EventService
+	User  UserService
 }
 
 // ServicesConfig represents functions that are meant to be running configurations
@@ -53,6 +54,14 @@ func WithEntries() ServicesConfig {
 func WithEvents() ServicesConfig {
 	return func(s *Services) error {
 		s.Event = NewEventService()
+		return nil
+	}
+}
+
+// WithUsers will initialize the Users service
+func WithUsers() ServicesConfig {
+	return func(s *Services) error {
+		s.User = NewUserService()
 		return nil
 	}
 }

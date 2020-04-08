@@ -19,6 +19,7 @@ func Queue(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	if !cmdInfo.Service.Event.EventExists(cmdInfo.CmdOps[1]) {
 		// Error - event doesn't exists
 		msg := cmdInfo.createMsgEmbed(
@@ -29,6 +30,7 @@ func Queue(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	// Add user to queue
 	host, err := cmdInfo.Service.Event.AddToQueue(cmdInfo.Msg.Author, cmdInfo.CmdOps[1])
 	if err != nil {
@@ -41,6 +43,7 @@ func Queue(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	embed := cmdInfo.createMsgEmbed(
 		"Successfully Added "+cmdInfo.Msg.Author.String()+" to Queue!", checkThumbURL, "Queue ID: "+cmdInfo.CmdOps[1],
 		successColor, format(

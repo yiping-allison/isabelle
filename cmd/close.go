@@ -40,7 +40,10 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 		return
 	}
 
-	// close the event
+	// store original host before removing event
+	host := cmdInfo.Service.Event.GetHost(eventID)
+
+	// attempt to close the event
 	err := cmdInfo.Service.Event.Close(eventID, cmdInfo.AdminRole, cmdInfo.Msg.Author, cmdInfo.Msg.Member.Roles)
 	if err != nil {
 		// Error - Permission denied
@@ -53,6 +56,10 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 		return
 	}
 
+	// Remove user from tracking
+	cmdInfo.Service.User.RemoveEvent(host, eventID)
+
+	// print msg
 	embed := cmdInfo.createMsgEmbed(
 		"Successfully Removed Event "+eventID+" from listings!", checkThumbURL, "Thank you for hosting!",
 		successColor, format(

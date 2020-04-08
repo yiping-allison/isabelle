@@ -24,6 +24,7 @@ func main() {
 		models.WithLogMode(true),
 		models.WithEntries(),
 		models.WithEvents(),
+		models.WithUsers(),
 	)
 	if err != nil {
 		fmt.Println(err)

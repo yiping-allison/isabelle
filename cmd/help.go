@@ -17,6 +17,7 @@ func Help(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	full := strings.Join(cmdInfo.CmdOps[1:], " ")
 	if !find(full, cmdInfo) {
 		// Command not found
@@ -26,6 +27,7 @@ func Help(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
 	// Valid commands
 	switch full {
 	case "search":

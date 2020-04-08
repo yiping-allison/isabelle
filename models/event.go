@@ -22,6 +22,7 @@ type Event interface {
 	Close(eventID, role string, user *discordgo.User, roles []string) error
 	Clean()
 	Remove(eventID string, user *discordgo.User)
+	GetHost(eventID string) *discordgo.User
 }
 
 // EventData represents an event a user has created
@@ -34,7 +35,7 @@ type EventData struct {
 
 type eventStore struct {
 	eb map[string]*EventData
-	m  *sync.Mutex
+	m  *sync.RWMutex
 }
 
 type eventService struct {
@@ -48,6 +49,16 @@ type QueueUser struct {
 
 // internal check to see if interface is implemented correctly
 var _ Event = &eventStore{}
+
+// GetHost returns the original host of the event
+func (es eventStore) GetHost(eventID string) *discordgo.User {
+	es.m.RLock()
+	defer es.m.RUnlock()
+	if val, ok := es.eb[eventID]; ok {
+		return val.DiscordUser
+	}
+	return nil
+}
 
 // EventExists will check if a requested event exists currently
 func (es eventStore) EventExists(msgID string) bool {
@@ -100,8 +111,8 @@ func (es eventStore) AddToQueue(User *discordgo.User, eventID string) (*discordg
 
 // GetQueue will return the current queue line
 func (es eventStore) GetQueue(eventID string) *[]QueueUser {
-	es.m.Lock()
-	defer es.m.Unlock()
+	es.m.RLock()
+	defer es.m.RUnlock()
 	val := es.eb[eventID]
 	return &val.Queue
 }
@@ -168,7 +179,7 @@ func NewEventService() EventService {
 	return eventService{
 		Event: eventStore{
 			eb: make(map[string]*EventData),
-			m:  &sync.Mutex{},
+			m:  &sync.RWMutex{},
 		},
 	}
 }

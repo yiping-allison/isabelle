@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -79,19 +80,9 @@ func Event(cmdInfo CommandInfo) {
 
 	if event == nil {
 		// Couldn't create an event - error
+		fmt.Println(event)
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "Try checking your command's syntax.", errColor,
-			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message]\"", false),
-			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
-		return
-	}
-
-	if cmdInfo.Service.Event.EventExists(cmdInfo.Msg.ID) {
-		// There's an event with the same ID
-		msg := cmdInfo.createMsgEmbed(
-			"Error: Couldn't Create Event", errThumbURL, "There is already an event with this ID; Please try again.", errColor,
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message]\"", false),
 			))
@@ -123,7 +114,37 @@ func Event(cmdInfo CommandInfo) {
 		return
 	}
 
+	if cmdInfo.Service.User.LimitEvent(cmdInfo.Msg.Author) {
+		// Error - Cannot create anymore events
+		msg := cmdInfo.createMsgEmbed(
+			"Error: Couldn't Create Event", errThumbURL, "You already have the max amount of events.", errColor,
+			format(
+				createFields("Suggestion", "Either end one of your events or wait until your events are finished before creating another.", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		return
+	}
+
+	if !cmdInfo.Service.User.UserExists(cmdInfo.Msg.Author) {
+		// add user to user tracking
+		cmdInfo.Service.User.AddUser(cmdInfo.Msg.Author)
+	}
+
+	if cmdInfo.Service.Event.EventExists(cmdInfo.Msg.ID[10:14]) {
+		// There's an event with the same ID
+		msg := cmdInfo.createMsgEmbed(
+			"Error: Couldn't Create Event", errThumbURL, "There is already an event with this ID; Please try again.", errColor,
+			format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message]\"", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		return
+	}
+
+	// Add the events to event and user tracking
 	cmdInfo.Service.Event.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14], limit)
+	cmdInfo.Service.User.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14])
+
 	msg := cmdInfo.createMsgEmbed(
 		"Event: "+event.Name,
 		event.Img,
@@ -139,11 +160,9 @@ func Event(cmdInfo CommandInfo) {
 
 // validMsg checks if a message is within text length
 func validMsg(msg, event string) bool {
-	var max int
+	max := 50
 	if event == "saharah" {
 		max = 100
-	} else {
-		max = 50
 	}
 	if len([]rune(msg)) > max {
 		return false
