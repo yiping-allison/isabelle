@@ -7,7 +7,7 @@ import (
 	"unicode"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/yiping-allison/daisymae/models"
+	"github.com/yiping-allison/isabelle/models"
 )
 
 type newEvent struct {

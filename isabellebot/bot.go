@@ -1,4 +1,4 @@
-package daisymaebot
+package isabellebot
 
 import (
 	"errors"
@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/yiping-allison/daisymae/cmd"
-	"github.com/yiping-allison/daisymae/models"
+	"github.com/yiping-allison/isabelle/cmd"
+	"github.com/yiping-allison/isabelle/models"
 )
 
 // Bot represents a daisymae bot instance
@@ -26,26 +26,26 @@ type Bot struct {
 // empty bot and err upon failure
 func New(botKey, admin string) (*Bot, error) {
 	if botKey == "" {
-		return nil, errors.New("daisymaebot: you need to input a botKey in the .config file")
+		return nil, errors.New("isabellebot: you need to input a botKey in the .config file")
 	}
 	discord, err := discordgo.New("Bot " + botKey)
 	if err != nil {
-		return nil, errors.New("daisymaebot: error connecting to discord")
+		return nil, errors.New("isabellebot: error connecting to discord")
 	}
 	// Commands Setup
 	cmds := make(map[string]Command, 0)
-	daisy := &Bot{
+	isa := &Bot{
 		AdminRole: admin,
 		Prefix:    "?",
 		DS:        discord,
 		Service:   models.Services{},
 		Commands:  cmds,
 	}
-	daisy.compileCommands()
+	isa.compileCommands()
 	// Add Handlers
-	daisy.DS.AddHandler(daisy.ready)
-	daisy.DS.AddHandler(daisy.handleMessage)
-	return daisy, nil
+	isa.DS.AddHandler(isa.ready)
+	isa.DS.AddHandler(isa.handleMessage)
+	return isa, nil
 }
 
 // ready will update bot status after bot receives "ready" event from

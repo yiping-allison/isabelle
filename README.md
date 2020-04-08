@@ -1,15 +1,14 @@
-# Daisy Mae
+# Isabelle
 
-## Animal Crossing New Horizons Turnip Discord Bot
+## Animal Crossing New Horizons Discord Bot
 
-**Daisy Mae** is a discord bot specifically for Animal Crossing New Horizons made with [DiscordGo](https://github.com/bwmarrin/discordgo). The goal is to make turnip trading
-and notifications for a discord server easier! (It's also a good way for me to practice Go ;) )
+**Isabelle** is a discord bot specifically for Animal Crossing New Horizons made with [DiscordGo](https://github.com/bwmarrin/discordgo). The goal is to make server and game interactions for a discord server easier! (It's also a good way for me to practice Go ;) )
 
-**NOTE:** I am not planning on making Daisy Mae into a moderation bot as there are a lot of good ones existing
+**NOTE:** I am not planning on making Isabelle into a moderation bot as there are a lot of good ones existing
 at the moment! Thanks!
 
-I will not be providing a server for this bot. If you would like to use Daisy Mae, please check out the documentation
-below.
+I will not be providing a server for this bot. If you would like to use Isabelle, please check out the documentation
+in the [wiki](https://github.com/yiping-allison/isabelle/wiki).
 
 ---
 
@@ -28,7 +27,7 @@ After, import the data using `setBugFish.psql` and `data.csv` (A easy way of doi
 
 ## Usage
 
-1. Clone or Download Repository or run `go get github.com/yiping-allison/daisymae`
+1. Clone or Download Repository or run `go get github.com/yiping-allison/isabelle`
 2. Configure example.config file and rename the file to: `.config`
 3. Run `go build`
 4. Run executable

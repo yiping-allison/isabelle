@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/yiping-allison/daisymae/models"
+	"github.com/yiping-allison/isabelle/models"
 )
 
 // Search will look up a possible insect or fish in the database and display to the user

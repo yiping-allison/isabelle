@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"github.com/yiping-allison/daisymae/models"
+	"github.com/yiping-allison/isabelle/models"
 )
 
 const (

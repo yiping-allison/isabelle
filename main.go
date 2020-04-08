@@ -8,8 +8,8 @@ import (
 	"time"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/yiping-allison/daisymae/daisymaebot"
-	"github.com/yiping-allison/daisymae/models"
+	"github.com/yiping-allison/isabelle/isabellebot"
+	"github.com/yiping-allison/isabelle/models"
 )
 
 func main() {
@@ -28,35 +28,35 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	daisy, err := daisymaebot.New(bc.BotKey, bc.AdminRole)
+	isa, err := isabellebot.New(bc.BotKey, bc.AdminRole)
 	if err != nil {
 		fmt.Printf("%s", err)
 		return
 	}
-	daisy.Service = *services
+	isa.Service = *services
 	// FIXME: Uncomment after integrating sql types
 	// daisy.Service.AutoMigrate()
-	defer daisy.Service.Close()
-	daisy.SetPrefix(bc.BotPrefix)
+	defer isa.Service.Close()
+	isa.SetPrefix(bc.BotPrefix)
 
 	go func() {
 		// check map and remove anything that expired
 		// every 15 minutes (can be changed if you want frequent or longer time interval cleaning)
-		ticker := time.NewTicker(15 * time.Minute)
+		cleanTicker := time.NewTicker(15 * time.Minute)
 		for {
 			select {
-			case <-ticker.C:
-				daisy.Service.Event.Clean()
+			case <-cleanTicker.C:
+				isa.Service.Event.Clean()
 			}
 		}
 	}()
 
-	err = daisy.DS.Open()
+	err = isa.DS.Open()
 	if err != nil {
 		fmt.Printf("Error opening connection; err = %v\n", err)
 		return
 	}
-	defer daisy.DS.Close()
+	defer isa.DS.Close()
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)

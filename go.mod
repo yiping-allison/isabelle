@@ -1,4 +1,4 @@
-module github.com/yiping-allison/daisymae
+module github.com/yiping-allison/isabelle
 
 go 1.14
 
