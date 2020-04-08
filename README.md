@@ -3,7 +3,7 @@
 ## Animal Crossing New Horizons Turnip Discord Bot
 
 **Daisy Mae** is a discord bot specifically for Animal Crossing New Horizons made with [DiscordGo](https://github.com/bwmarrin/discordgo). The goal is to make turnip trading
-and notifications for a discord server eaiser! (It's also a good way for me to practice Go ;) )
+and notifications for a discord server easier! (It's also a good way for me to practice Go ;) )
 
 **NOTE:** I am not planning on making Daisy Mae into a moderation bot as there are a lot of good ones existing
 at the moment! Thanks!
