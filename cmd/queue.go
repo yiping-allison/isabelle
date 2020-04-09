@@ -31,6 +31,17 @@ func Queue(cmdInfo CommandInfo) {
 		return
 	}
 
+	if cmdInfo.Service.User.LimitQueue(cmdInfo.Msg.Author) {
+		// Error - max queue reached
+		msg := cmdInfo.createMsgEmbed(
+			"Error: Max Queue reached", errThumbURL, "You already reached the max queue.",
+			errColor, format(
+				createFields("Suggestion", "Remove a queue before trying to add another queue.", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		return
+	}
+
 	// Add user to queue
 	host, err := cmdInfo.Service.Event.AddToQueue(cmdInfo.Msg.Author, cmdInfo.CmdOps[1])
 	if err != nil {
@@ -43,6 +54,14 @@ func Queue(cmdInfo CommandInfo) {
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
+	// if user doesn't exist in user tracking, create a new one
+	if !cmdInfo.Service.User.UserExists(cmdInfo.Msg.Author) {
+		cmdInfo.Service.User.AddUser(cmdInfo.Msg.Author)
+	}
+
+	// Add queue to user tracking
+	cmdInfo.Service.User.AddQueue(cmdInfo.CmdOps[1], cmdInfo.Msg.Author, cmdInfo.Service.Event.GetExpiration(cmdInfo.CmdOps[1]))
 
 	embed := cmdInfo.createMsgEmbed(
 		"Successfully Added "+cmdInfo.Msg.Author.String()+" to Queue!", checkThumbURL, "Queue ID: "+cmdInfo.CmdOps[1],

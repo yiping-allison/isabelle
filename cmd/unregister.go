@@ -36,7 +36,12 @@ func (c CommandInfo) removeFromEvent(eventID string, user *discordgo.User) {
 		c.Ses.ChannelMessageSendEmbed(c.Msg.ChannelID, msg)
 		return
 	}
+
+	// remove user
 	c.Service.Event.Remove(eventID, user)
+	// Remove tracking on user
+	c.Service.User.RemoveQueue(eventID, user)
+
 	// successfully removed user
 	msg := c.createMsgEmbed(
 		"Removed "+c.Msg.Author.String()+" from Event", checkThumbURL, "Queue ID: "+c.CmdOps[2],

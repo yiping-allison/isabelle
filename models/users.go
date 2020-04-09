@@ -29,6 +29,10 @@ type User interface {
 	LimitEvent(user *discordgo.User) bool
 	RemoveEvent(user *discordgo.User, eventID string)
 	Clean()
+	AddQueue(eventID string, user *discordgo.User, expire time.Time)
+	LimitQueue(user *discordgo.User) bool
+	RemoveQueue(eventID string, user *discordgo.User)
+	RemoveAllQueue(eventID string)
 }
 
 type userService struct {
@@ -59,6 +63,60 @@ type UserData struct {
 
 // internal check to see if interface is implemented correctly
 var _ User = &userStore{}
+
+// RemoveAllQueue will remove all users with a certain eventID
+func (us userStore) RemoveAllQueue(eventID string) {
+	us.m.Lock()
+	defer us.m.Unlock()
+	var ret []tQueue
+	for k, v := range us.user {
+		for _, id := range v.queues {
+			if id.eventID == eventID {
+				continue
+			}
+			ret = append(ret, id)
+		}
+		us.user[k].queues = ret
+	}
+}
+
+// LimitQueue returns true when user hit max queue amount
+//
+// Otherwise, it return false
+func (us userStore) LimitQueue(user *discordgo.User) bool {
+	us.m.RLock()
+	defer us.m.RUnlock()
+	if !us.UserExists(user) {
+		return false
+	}
+	return len(us.user[user.ID].queues) == MaxQueue
+}
+
+// RemoveQueue will remove an item from the queue slice
+func (us userStore) RemoveQueue(eventID string, user *discordgo.User) {
+	us.m.Lock()
+	defer us.m.Unlock()
+	var ret []tQueue
+	for _, v := range us.user[user.ID].queues {
+		if v.eventID == eventID {
+			continue
+		}
+		ret = append(ret, v)
+	}
+	us.user[user.ID].queues = ret
+}
+
+// AddQueue adds an item to the queue
+func (us userStore) AddQueue(eventID string, user *discordgo.User, expire time.Time) {
+	us.m.Lock()
+	defer us.m.Unlock()
+	new := tQueue{
+		eventID: eventID,
+		expire:  expire,
+	}
+	val := us.user[user.ID]
+	val.queues = append(val.queues, new)
+}
 
 // RemoveEvent removes an event from a user's tracking state
 func (us userStore) RemoveEvent(user *discordgo.User, eventID string) {

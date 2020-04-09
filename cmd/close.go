@@ -56,6 +56,8 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 		return
 	}
 
+	// remove all people tracking event
+	cmdInfo.Service.User.RemoveAllQueue(eventID)
 	// Remove user from tracking
 	cmdInfo.Service.User.RemoveEvent(host, eventID)
 
