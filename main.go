@@ -40,18 +40,8 @@ func main() {
 	defer isa.Service.Close()
 	isa.SetPrefix(bc.BotPrefix)
 
-	go func() {
-		// check map and remove anything that expired
-		// every 15 minutes (can be changed if you want frequent or longer time interval cleaning)
-		cleanTicker := time.NewTicker(15 * time.Minute)
-		for {
-			select {
-			case <-cleanTicker.C:
-				isa.Service.Event.Clean()
-				isa.Service.User.Clean()
-			}
-		}
-	}()
+	cleaning := scheduleClean(clean, 15*time.Minute, isa)
+	defer cleaning.Stop()
 
 	err = isa.DS.Open()
 	if err != nil {
@@ -64,4 +54,21 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
+}
+
+// clean will call the routine cleans for event and user tracking
+func clean(isa *isabellebot.Bot) {
+	isa.Service.Event.Clean()
+	isa.Service.User.Clean()
+}
+
+// scheduleClean will run routine cleaning after specified time duration
+func scheduleClean(f func(*isabellebot.Bot), interval time.Duration, isa *isabellebot.Bot) *time.Ticker {
+	ticker := time.NewTicker(interval)
+	go func() {
+		for range ticker.C {
+			f(isa)
+		}
+	}()
+	return ticker
 }
