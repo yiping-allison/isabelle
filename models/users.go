@@ -2,6 +2,7 @@ package models
 
 import (
 	"sync"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -24,9 +25,10 @@ type UserService interface {
 type User interface {
 	UserExists(user *discordgo.User) bool
 	AddUser(user *discordgo.User) error
-	AddEvent(user *discordgo.User, eventID string)
+	AddEvent(user *discordgo.User, eventID string, expire time.Time)
 	LimitEvent(user *discordgo.User) bool
 	RemoveEvent(user *discordgo.User, eventID string)
+	Clean()
 }
 
 type userService struct {
@@ -38,11 +40,21 @@ type userStore struct {
 	m    *sync.RWMutex
 }
 
+type tEvent struct {
+	eventID string
+	expire  time.Time
+}
+
+type tQueue struct {
+	eventID string
+	expire  time.Time
+}
+
 // UserData represents user data bot needs to keep track of
 // in order to perform event and queue services
 type UserData struct {
-	events []string
-	queues []string
+	events []tEvent
+	queues []tQueue
 }
 
 // internal check to see if interface is implemented correctly
@@ -59,10 +71,10 @@ func (us userStore) RemoveEvent(user *discordgo.User, eventID string) {
 // event list
 //
 // This is a helper func to be used with RemoveEvent
-func removeEvent(eventID string, events []string) []string {
-	var ret []string
+func removeEvent(eventID string, events []tEvent) []tEvent {
+	var ret []tEvent
 	for _, i := range events {
-		if i == eventID {
+		if i.eventID == eventID {
 			continue
 		}
 		ret = append(ret, i)
@@ -95,11 +107,15 @@ func (us userStore) UserExists(user *discordgo.User) bool {
 }
 
 // AddEvent adds a new event to the user tracking events
-func (us userStore) AddEvent(user *discordgo.User, eventID string) {
+func (us userStore) AddEvent(user *discordgo.User, eventID string, expire time.Time) {
 	us.m.Lock()
 	defer us.m.Unlock()
 	val := us.user[user.ID].events
-	val = append(val, eventID)
+	new := tEvent{
+		eventID: eventID,
+		expire:  expire,
+	}
+	val = append(val, new)
 	us.user[user.ID].events = val
 }
 
@@ -108,8 +124,8 @@ func (us userStore) AddEvent(user *discordgo.User, eventID string) {
 func (us userStore) AddUser(user *discordgo.User) error {
 	us.m.Lock()
 	defer us.m.Unlock()
-	e := make([]string, 0)
-	q := make([]string, 0)
+	e := make([]tEvent, 0)
+	q := make([]tQueue, 0)
 	data := UserData{
 		events: e,
 		queues: q,
@@ -125,5 +141,35 @@ func NewUserService() UserService {
 			user: make(map[string]*UserData),
 			m:    &sync.RWMutex{},
 		},
+	}
+}
+
+// Clean will remove event listings from tracking that have exceeded time limit
+//
+// DO NOT CALL THIS RANDOMLY!!
+//
+// This should only be called in the goroutine in main (ticker to check expiration)
+func (us userStore) Clean() {
+	us.m.Lock()
+	defer us.m.Unlock()
+	var newE []tEvent
+	var newQ []tQueue
+	for k, v := range us.user {
+		for _, event := range v.events {
+			if time.Now().Sub(event.expire) > 0 {
+				// remove this event
+				continue
+			}
+			newE = append(newE, event)
+		}
+		us.user[k].events = newE
+		for _, queue := range v.queues {
+			if time.Now().Sub(queue.expire) > 0 {
+				// remove this queue
+				continue
+			}
+			newQ = append(newQ, queue)
+		}
+		us.user[k].queues = newQ
 	}
 }

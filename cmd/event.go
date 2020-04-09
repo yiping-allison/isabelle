@@ -143,7 +143,9 @@ func Event(cmdInfo CommandInfo) {
 
 	// Add the events to event and user tracking
 	cmdInfo.Service.Event.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14], limit)
-	cmdInfo.Service.User.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14])
+	// record expiration time
+	expire := cmdInfo.Service.Event.GetExpiration(cmdInfo.Msg.ID[10:14])
+	cmdInfo.Service.User.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14], expire)
 
 	msg := cmdInfo.createMsgEmbed(
 		"Event: "+event.Name,

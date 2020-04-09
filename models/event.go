@@ -23,6 +23,7 @@ type Event interface {
 	Clean()
 	Remove(eventID string, user *discordgo.User)
 	GetHost(eventID string) *discordgo.User
+	GetExpiration(eventID string) time.Time
 }
 
 // EventData represents an event a user has created
@@ -58,6 +59,14 @@ func (es eventStore) GetHost(eventID string) *discordgo.User {
 		return val.DiscordUser
 	}
 	return nil
+}
+
+// GetExpiration returns the expiration time of a particular event
+func (es eventStore) GetExpiration(eventID string) time.Time {
+	es.m.RLock()
+	defer es.m.RUnlock()
+	ret := es.eb[eventID]
+	return ret.Expiration
 }
 
 // EventExists will check if a requested event exists currently

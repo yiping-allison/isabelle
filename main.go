@@ -48,6 +48,7 @@ func main() {
 			select {
 			case <-cleanTicker.C:
 				isa.Service.Event.Clean()
+				isa.Service.User.Clean()
 			}
 		}
 	}()
