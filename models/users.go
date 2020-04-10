@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -13,6 +14,9 @@ const (
 
 	// MaxEvent limits the amount of events a user can create
 	MaxEvent int = 1
+
+	// MaxTrade limits the amount of trades a user can create
+	MaxTrade int = 2
 )
 
 // UserService wraps to the User interface
@@ -23,6 +27,7 @@ type UserService interface {
 // User defines all the methods we can use to interact with
 // the User Service
 type User interface {
+	AddTrade(user *discordgo.User, tradeID string)
 	UserExists(user *discordgo.User) bool
 	AddUser(user *discordgo.User) error
 	AddEvent(user *discordgo.User, eventID string, expire time.Time)
@@ -33,6 +38,7 @@ type User interface {
 	LimitQueue(user *discordgo.User) bool
 	RemoveQueue(eventID string, user *discordgo.User)
 	RemoveAllQueue(eventID string)
+	LimitTrade(userID string) bool
 }
 
 type userService struct {
@@ -54,15 +60,38 @@ type tQueue struct {
 	expire  time.Time
 }
 
+// Trades defines a trade event
+type Trades struct {
+	tradeID string
+}
+
 // UserData represents user data bot needs to keep track of
 // in order to perform event and queue services
 type UserData struct {
 	events []tEvent
 	queues []tQueue
+	trades []Trades
 }
 
 // internal check to see if interface is implemented correctly
 var _ User = &userStore{}
+
+func (us userStore) AddTrade(user *discordgo.User, tradeID string) {
+	// TODO: Finish this
+}
+
+// LimitTrade returns true when the user has reached
+// the max amount of trade creation
+func (us userStore) LimitTrade(userID string) bool {
+	us.m.Lock()
+	defer us.m.Unlock()
+	fmt.Println(userID)
+	val := us.user[userID]
+	if len(val.trades) == 0 {
+		return false
+	}
+	return len(val.trades) == MaxTrade
+}
 
 // RemoveAllQueue will remove all users with a certain eventID
 func (us userStore) RemoveAllQueue(eventID string) {
@@ -142,7 +171,7 @@ func removeEvent(eventID string, events []tEvent) []tEvent {
 
 // LimitEvent returns true if the user has an event list equal to the max event
 //
-// In otherwords, if this is true, the user should now be able to
+// In otherwords, if this is true, the user should not be able to
 // make more events
 func (us userStore) LimitEvent(user *discordgo.User) bool {
 	us.m.RLock()
@@ -184,9 +213,11 @@ func (us userStore) AddUser(user *discordgo.User) error {
 	defer us.m.Unlock()
 	e := make([]tEvent, 0)
 	q := make([]tQueue, 0)
+	t := make([]Trades, 0)
 	data := UserData{
 		events: e,
 		queues: q,
+		trades: t,
 	}
 	us.user[user.ID] = &data
 	return nil

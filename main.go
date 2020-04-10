@@ -19,12 +19,16 @@ func main() {
 		return
 	}
 	dbCfg := bc.Database
+
+	// start all services
 	services, err := models.NewServices(
 		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
 		models.WithLogMode(true),
 		models.WithEntries(),
 		models.WithEvents(),
 		models.WithUsers(),
+		models.WithRep(),
+		models.WithTrades(),
 	)
 	if err != nil {
 		fmt.Println(err)
@@ -34,12 +38,18 @@ func main() {
 		fmt.Printf("%s", err)
 		return
 	}
-	isa.Service = *services
-	// FIXME: Uncomment after integrating sql types
-	// daisy.Service.AutoMigrate()
-	defer isa.Service.Close()
-	isa.SetPrefix(bc.BotPrefix)
 
+	// set services
+	isa.Service = *services
+
+	// Auto migrate tables
+	isa.Service.AutoMigrate()
+
+	defer isa.Service.Close()
+
+	// Set user bot prefix
+	isa.SetPrefix(bc.BotPrefix)
+	// Set cleaning schedule
 	cleaning := scheduleClean(clean, 15*time.Minute, isa)
 	defer cleaning.Stop()
 

@@ -12,6 +12,8 @@ type Services struct {
 	Entry EntryService
 	Event EventService
 	User  UserService
+	Rep   RepService
+	Trade TradeService
 }
 
 // ServicesConfig represents functions that are meant to be running configurations
@@ -66,6 +68,22 @@ func WithUsers() ServicesConfig {
 	}
 }
 
+// WithRep will initialize the Rep service
+func WithRep() ServicesConfig {
+	return func(s *Services) error {
+		s.Rep = NewRepService(s.db)
+		return nil
+	}
+}
+
+// WithTrades will start a new Trades Service
+func WithTrades() ServicesConfig {
+	return func(s *Services) error {
+		s.Trade = NewTradeService()
+		return nil
+	}
+}
+
 // WithLogMode makes sure that every database interaction in logged whether
 // for debugging or other logging purposes
 func WithLogMode(mode bool) ServicesConfig {
@@ -82,5 +100,5 @@ func (s Services) Close() error {
 
 // AutoMigrate attempts to automigrate sql tables
 func (s Services) AutoMigrate() error {
-	return s.db.AutoMigrate(&Entry{}).Error
+	return s.db.AutoMigrate(&Rep{}).Error
 }

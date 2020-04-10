@@ -37,6 +37,7 @@ func Help(cmdInfo CommandInfo) {
 				createFields("EXAMPLE", cmdInfo.Prefix+"search north bug", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
 	case "event":
 		msg := cmdInfo.createMsgEmbed("Event", helpThumbURL, "Creates visitation events.",
 			helpColor, format(
@@ -44,26 +45,24 @@ func Help(cmdInfo CommandInfo) {
 				createFields("EXAMPLE", cmdInfo.Prefix+"event 1234", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
 	case "queue":
 		msg := cmdInfo.createMsgEmbed("Queue", helpThumbURL, "Join a queue for visitation events.",
 			helpColor, format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"queue 1234", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
 	case "close":
 		msg := cmdInfo.createMsgEmbed("Close", helpThumbURL, "Ends events.",
 			helpColor, format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"close event 1234", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
 	case "list":
 		msg := cmdInfo.createMsgEmbed("List", helpThumbURL, "Displays all bot commands.", helpColor,
 			format(createFields("EXAMPLE", cmdInfo.Prefix+"list", true)))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
-	case "pong":
-		msg := cmdInfo.createMsgEmbed("Pong", helpThumbURL, "Playing with pong.", helpColor, format(
-			createFields("EXAMPLE", cmdInfo.Prefix+"pong", true),
-		))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 	}
 }

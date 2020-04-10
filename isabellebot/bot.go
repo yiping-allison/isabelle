@@ -125,6 +125,8 @@ func (b *Bot) compileCommands() {
 	b.addCommand("queue", cmd.Queue)
 	b.addCommand("close", cmd.Close)
 	b.addCommand("unregister", cmd.Unregister)
+	b.addCommand("trade", cmd.Trade)
+	b.addCommand("offer", cmd.Offer)
 }
 
 // utility func to add command to bot command map

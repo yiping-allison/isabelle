@@ -12,6 +12,7 @@ const (
 	blobSThumbURL string = "https://gerhardinger.org/wp-content/uploads/2017/05/icon-world.png"
 	checkThumbURL string = "https://cdn.discordapp.com/attachments/693564368423616562/696816758945742868/Success.png"
 	queueThumbURL string = "https://cdn.discordapp.com/attachments/693564368423616562/696802401490960505/Queue.png"
+	tradeThumbURL string = "https://cdn.discordapp.com/attachments/693564368423616562/698023785164439562/trade-icon.png"
 )
 
 const (
@@ -21,6 +22,7 @@ const (
 	searchColor  int = 9526403
 	eventColor   int = 3108709
 	successColor int = 3764015
+	tradeColor   int = 15893760
 )
 
 // CommandInfo represents all metadata discord and bot needs to
