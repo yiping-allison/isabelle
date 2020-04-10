@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -18,7 +20,7 @@ func Unregister(cmdInfo CommandInfo) {
 		return
 	}
 	args := cmdInfo.CmdOps[1:]
-	switch args[0] {
+	switch strings.ToLower(args[0]) {
 	case "event":
 		cmdInfo.removeFromEvent(args[1], cmdInfo.Msg.Author)
 	}

@@ -14,6 +14,7 @@ func Close(cmdInfo CommandInfo) {
 			"Error: Incorrect Arguments Supplied", errThumbURL, "Please check your syntax.", errColor,
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"close event 1234", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"close trade 1234", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
@@ -22,8 +23,9 @@ func Close(cmdInfo CommandInfo) {
 	t := strings.ToLower(cmdInfo.CmdOps[1])
 	switch t {
 	case "event":
-		// close an event
 		closeEvent(cmdInfo.CmdOps[2], cmdInfo)
+	case "trade":
+		closeTrade(cmdInfo.CmdOps[2], cmdInfo)
 	}
 }
 
@@ -67,6 +69,48 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 		successColor, format(
 			createFields("Suggestion", "If you are planning on opening another event, it is safe to do so now.", false),
 			createFields("Suggestion", "If your event was deleted by a moderator, please make sure to follow event guidelines.", false),
+		))
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, embed)
+}
+
+// closeTrade is a helper func which closes a trade event and
+// removes all trade tracking from the original user
+func closeTrade(tradeID string, cmdInfo CommandInfo) {
+	// REVIEW: Do I need to add trade tracking per user?
+	if !cmdInfo.Service.Trade.Exists(tradeID) {
+		// error - trade event doesn't exist
+		msg := cmdInfo.createMsgEmbed(
+			"Error: Trade Not Found", errThumbURL, "Trade ID: "+tradeID, errColor,
+			format(
+				createFields("Suggestion", "Try checking if you supplied a valid Trade ID.", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		return
+	}
+
+	// get the original creator of the trade
+	host := cmdInfo.Service.Trade.GetHost(tradeID)
+	// attempt to close the trade
+	err := cmdInfo.Service.Trade.Close(tradeID, cmdInfo.Msg.Author, cmdInfo.Msg.Member.Roles, cmdInfo.AdminRole)
+	if err != nil {
+		// error - user does not have permission to close event
+		msg := cmdInfo.createMsgEmbed(
+			"Error: You do not have permission to delete this trade", errThumbURL, "Trade ID: "+tradeID, errColor,
+			format(
+				createFields("Suggestion", "Try checking if you supplied the right Trade ID.", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		return
+	}
+	// remove host from user tracking
+	cmdInfo.Service.User.RemoveTrade(tradeID, host)
+
+	// print msg
+	embed := cmdInfo.createMsgEmbed(
+		"Successfully Removed Trade "+tradeID+" from listings!", checkThumbURL, "Thank you for hosting!",
+		successColor, format(
+			createFields("Suggestion", "If you are planning on opening another trade, it is safe to do so now.", false),
+			createFields("Suggestion", "If your trade was deleted by a moderator, please make sure to follow trade guidelines.", false),
 		))
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, embed)
 }

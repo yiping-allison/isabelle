@@ -39,6 +39,7 @@ type User interface {
 	RemoveQueue(eventID string, user *discordgo.User)
 	RemoveAllQueue(eventID string)
 	LimitTrade(userID string) bool
+	RemoveTrade(tradeID string, user *discordgo.User)
 }
 
 type userService struct {
@@ -76,8 +77,29 @@ type UserData struct {
 // internal check to see if interface is implemented correctly
 var _ User = &userStore{}
 
+// RemoveTrade removes a trade event from tracking
+func (us userStore) RemoveTrade(tradeID string, user *discordgo.User) {
+	us.m.Lock()
+	defer us.m.Unlock()
+	var ret []Trades
+	for _, v := range us.user[user.ID].trades {
+		if v.tradeID == tradeID {
+			continue
+		}
+		ret = append(ret, v)
+	}
+	us.user[user.ID].trades = ret
+}
+
+// AddTrade will add a trade event to user tracking
 func (us userStore) AddTrade(user *discordgo.User, tradeID string) {
-	// TODO: Finish this
+	us.m.Lock()
+	defer us.m.Unlock()
+	new := Trades{
+		tradeID: tradeID,
+	}
+	val := us.user[user.ID]
+	val.trades = append(val.trades, new)
 }
 
 // LimitTrade returns true when the user has reached
@@ -93,7 +115,7 @@ func (us userStore) LimitTrade(userID string) bool {
 	return len(val.trades) == MaxTrade
 }
 
-// RemoveAllQueue will remove all users with a certain eventID
+// RemoveAllQueue will remove all events with a certain eventID from all users
 func (us userStore) RemoveAllQueue(eventID string) {
 	us.m.Lock()
 	defer us.m.Unlock()

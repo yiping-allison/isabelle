@@ -2,17 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"math/rand"
 	"strconv"
 	"strings"
 
 	"github.com/yiping-allison/isabelle/models"
-)
-
-const (
-	// MaxTrade defines the max amount of trade events a user can make
-	// at a time
-	MaxTrade int = 2
 )
 
 // Trade will handle trade options within the server
@@ -43,18 +36,33 @@ func Trade(cmdInfo CommandInfo) {
 
 	if cmdInfo.Service.User.LimitTrade(user.ID) {
 		// Max trades created - can't make anymore
+		msg := cmdInfo.createMsgEmbed(
+			"Error: Couldn't Create Trade", errThumbURL, "You already have the max trade events.", errColor,
+			format(
+				createFields("Suggestion", "Either end one of your trades or wait until they are finished before creating another.", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
 
 	// generate trade id
 	id := generateID(1000, 9999)
 
-	// TODO: Add trade tracking in models...
 	if cmdInfo.Service.Trade.Exists(id) {
 		// error - id exists
+		msg := cmdInfo.createMsgEmbed(
+			"Error: Couldn't Create Trade", errThumbURL, "This ID already exists.", errColor,
+			format(
+				createFields("Suggestion", "Try re-creating the trade event.", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
+
+	// Add trade event
 	cmdInfo.Service.Trade.AddTrade(id, user)
+	// Add trade tracking to user
+	cmdInfo.Service.User.AddTrade(user, id)
 
 	// retrieve reps from database
 	reps := cmdInfo.Service.Rep.GetRep(user.ID)
@@ -70,13 +78,4 @@ func Trade(cmdInfo CommandInfo) {
 		),
 	)
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
-}
-
-// generateID will come up with a pseudo random number with 4 digits
-// and return it in string format
-//
-// This is used to generate trade IDs
-func generateID(min, max int) string {
-	id := min + rand.Intn(max-min)
-	return strconv.Itoa(id)
 }

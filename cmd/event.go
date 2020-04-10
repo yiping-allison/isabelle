@@ -34,7 +34,7 @@ func Event(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: No Arguments", errThumbURL, "You must supply arguments to the command.", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy time=\"[Your time]\" msg=\"[Your message]\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"2\" msg=\"bonsai tree recipe\"", false),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
@@ -84,7 +84,7 @@ func Event(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "Try checking your command's syntax.", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message]\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"5\" msg=\"ironwood bed\"", false),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
@@ -97,7 +97,7 @@ func Event(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "Your limit must be a valid number", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message]\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"5\" msg=\"ironwood bed\"", false),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
@@ -108,7 +108,7 @@ func Event(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "Your message must be within valid length", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message (50 chars for all events except Saharah at 100 chars)]\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"5\" msg=\"ironwood bed\"", false),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
@@ -125,32 +125,35 @@ func Event(cmdInfo CommandInfo) {
 		return
 	}
 
+	// if the user doesn't currently exist in tracking, create a new one
 	if !cmdInfo.Service.User.UserExists(cmdInfo.Msg.Author) {
-		// add user to user tracking
 		cmdInfo.Service.User.AddUser(cmdInfo.Msg.Author)
 	}
 
-	if cmdInfo.Service.Event.EventExists(cmdInfo.Msg.ID[10:14]) {
+	// generate a random id with at least 4 digits
+	id := generateID(1000, 9999)
+
+	if cmdInfo.Service.Event.EventExists(id) {
 		// There's an event with the same ID
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Create Event", errThumbURL, "There is already an event with this ID; Please try again.", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"[Your limit (number within 1-20)]\" msg=\"[Your message]\"", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"5\" msg=\"ironwood bed\"", false),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return
 	}
 
-	// Add the events to event and user tracking
-	cmdInfo.Service.Event.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14], limit)
+	// Add the event to tracking
+	cmdInfo.Service.Event.AddEvent(cmdInfo.Msg.Author, id, limit)
 	// record expiration time
-	expire := cmdInfo.Service.Event.GetExpiration(cmdInfo.Msg.ID[10:14])
-	cmdInfo.Service.User.AddEvent(cmdInfo.Msg.Author, cmdInfo.Msg.ID[10:14], expire)
+	expire := cmdInfo.Service.Event.GetExpiration(id)
+	cmdInfo.Service.User.AddEvent(cmdInfo.Msg.Author, id, expire)
 
 	msg := cmdInfo.createMsgEmbed(
 		"Event: "+event.Name,
 		event.Img,
-		"Queue ID: "+cmdInfo.Msg.ID[10:14],
+		"Queue ID: "+id,
 		eventColor,
 		format(
 			createFields("Hosted By", cmdInfo.Msg.Author.String(), true),

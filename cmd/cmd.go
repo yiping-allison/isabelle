@@ -1,6 +1,10 @@
 package cmd
 
 import (
+	"math/rand"
+	"strconv"
+	"time"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/yiping-allison/isabelle/models"
 )
@@ -52,6 +56,16 @@ type CommandInfo struct {
 	CmdName   string
 	CmdOps    []string
 	CmdList   []string
+}
+
+// generateID will come up with a pseudo random number with 4 digits
+// and return it in string format
+//
+// This is used to generate different event IDs
+func generateID(min, max int) string {
+	rand.Seed(time.Now().UnixNano())
+	id := min + rand.Intn(max-min)
+	return strconv.Itoa(id)
 }
 
 // format is a utility func which takes in a variadic parameter of discord message embed field
