@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
@@ -56,6 +57,22 @@ type CommandInfo struct {
 	CmdName   string
 	CmdOps    []string
 	CmdList   []string
+}
+
+// newRep creates a new rep database objects and inserts it into
+// postgreSQL
+func (c CommandInfo) newRep(user *discordgo.User) {
+	// user does not exist in rep database
+	// initialize user to 0
+	rep := models.Rep{
+		DiscordID: user.ID,
+		RepNum:    0,
+	}
+	err := c.Service.Rep.Create(&rep)
+	if err != nil {
+		fmt.Println("Trade(): error creating new user in database...")
+		return
+	}
 }
 
 // generateID will come up with a pseudo random number with 4 digits

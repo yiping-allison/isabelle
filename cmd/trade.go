@@ -1,11 +1,8 @@
 package cmd
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/yiping-allison/isabelle/models"
 )
 
 // Trade will handle trade options within the server
@@ -14,18 +11,9 @@ import (
 // for members to trade and offer items among each other
 func Trade(cmdInfo CommandInfo) {
 	user := cmdInfo.Msg.Author
+	// if user doesn't exist in rep database, create a new one
 	if !cmdInfo.Service.Rep.Exists(user.ID) {
-		// user does not exist in database
-		// initialize user to 0
-		rep := models.Rep{
-			DiscordID: user.ID,
-			RepNum:    0,
-		}
-		err := cmdInfo.Service.Rep.Create(&rep)
-		if err != nil {
-			fmt.Println("Trade(): error creating new user in database...")
-			return
-		}
+		cmdInfo.newRep(user)
 	}
 
 	// If the user currently doesn't exist in server tracking, make a new one

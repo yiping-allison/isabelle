@@ -16,6 +16,8 @@ type TradeService interface {
 // Trade contains all the methods we can use to interact with
 // trade data
 type Trade interface {
+	GetOffer(tradeID, userID string) string
+
 	// Clean will remove an expired item from the map
 	Clean()
 
@@ -39,6 +41,9 @@ type Trade interface {
 	// Close will close a trade event. If the user does not have permission to close the event, the func
 	// will return an error
 	Close(tradeID string, user *discordgo.User, userRoles []string, adminID string) error
+
+	// Remove removes a user's offer from a tradeID
+	Remove(tradeID string, user *discordgo.User)
 }
 
 // TradeData represents all data needed to keep
@@ -66,6 +71,18 @@ type tradeService struct {
 
 var _ Trade = &tradeStore{}
 
+func (ts tradeStore) GetOffer(tradeID, userID string) string {
+	ts.m.RLock()
+	defer ts.m.RUnlock()
+	val := ts.ts[tradeID].Offers
+	for _, v := range val {
+		if v.user.ID == userID {
+			return v.offer
+		}
+	}
+	return ""
+}
+
 // Clean will remove an expired item from the map
 func (ts tradeStore) Clean() {
 	ts.m.Lock()
@@ -75,6 +92,24 @@ func (ts tradeStore) Clean() {
 			delete(ts.ts, k)
 		}
 	}
+}
+
+// Remove removes a user's offer from a tradeID
+func (ts tradeStore) Remove(tradeID string, user *discordgo.User) {
+	ts.m.Lock()
+	defer ts.m.Unlock()
+	ts.ts[tradeID].Offers = removeOffer(user, ts.ts[tradeID].Offers)
+}
+
+func removeOffer(user *discordgo.User, offers []TradeOfferer) []TradeOfferer {
+	var ret []TradeOfferer
+	for _, val := range offers {
+		if val.user.ID == user.ID {
+			continue
+		}
+		ret = append(ret, val)
+	}
+	return ret
 }
 
 // GetExpiration returns the expiration time of the trade event

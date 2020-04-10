@@ -27,6 +27,8 @@ type UserService interface {
 // User defines all the methods we can use to interact with
 // the User Service
 type User interface {
+	AddOffer(tradeID string, user *discordgo.User, expire time.Time)
+	RemoveOffer(tradeID string, user *discordgo.User)
 	AddTrade(user *discordgo.User, tradeID string, expire time.Time)
 	UserExists(user *discordgo.User) bool
 	AddUser(user *discordgo.User) error
@@ -67,16 +69,49 @@ type Trades struct {
 	expire  time.Time
 }
 
+type Offers struct {
+	tradeID string
+	expire  time.Time
+}
+
 // UserData represents user data bot needs to keep track of
 // in order to perform event and queue services
 type UserData struct {
 	events []tEvent
 	queues []tQueue
 	trades []Trades
+	offer  []Offers
 }
 
 // internal check to see if interface is implemented correctly
 var _ User = &userStore{}
+
+// RemoveOffer removes an offer from user tracking after user
+// unregisters from trade event
+func (us userStore) RemoveOffer(tradeID string, user *discordgo.User) {
+	us.m.Lock()
+	defer us.m.Unlock()
+	var ret []Offers
+	for _, v := range us.user[user.ID].offer {
+		if v.tradeID == tradeID {
+			continue
+		}
+		ret = append(ret, v)
+	}
+	us.user[user.ID].offer = ret
+}
+
+// AddOffer adds an offer to user tracking when user offers can item to a trade event
+func (us userStore) AddOffer(tradeID string, user *discordgo.User, expire time.Time) {
+	us.m.Lock()
+	defer us.m.Unlock()
+	new := Offers{
+		tradeID: tradeID,
+		expire:  expire,
+	}
+	val := us.user[user.ID]
+	val.offer = append(val.offer, new)
+}
 
 // RemoveTrade removes a trade event from tracking
 func (us userStore) RemoveTrade(tradeID string, user *discordgo.User) {
@@ -107,8 +142,8 @@ func (us userStore) AddTrade(user *discordgo.User, tradeID string, expire time.T
 // LimitTrade returns true when the user has reached
 // the max amount of trade creation
 func (us userStore) LimitTrade(userID string) bool {
-	us.m.Lock()
-	defer us.m.Unlock()
+	us.m.RLock()
+	defer us.m.RUnlock()
 	fmt.Println(userID)
 	val := us.user[userID]
 	if len(val.trades) == 0 {
@@ -238,10 +273,12 @@ func (us userStore) AddUser(user *discordgo.User) error {
 	e := make([]tEvent, 0)
 	q := make([]tQueue, 0)
 	t := make([]Trades, 0)
+	o := make([]Offers, 0)
 	data := UserData{
 		events: e,
 		queues: q,
 		trades: t,
+		offer:  o,
 	}
 	us.user[user.ID] = &data
 	return nil
@@ -268,6 +305,7 @@ func (us userStore) Clean() {
 	var newE []tEvent
 	var newQ []tQueue
 	var newT []Trades
+	var newO []Offers
 	for k, v := range us.user {
 		// remove events
 		for _, event := range v.events {
@@ -295,5 +333,13 @@ func (us userStore) Clean() {
 			newT = append(newT, trade)
 		}
 		us.user[k].trades = newT
+		// remove offers
+		for _, offer := range v.offer {
+			if time.Now().Sub(offer.expire) > 0 {
+				continue
+			}
+			newO = append(newO, offer)
+		}
+		us.user[k].offer = newO
 	}
 }
