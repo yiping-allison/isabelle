@@ -49,7 +49,7 @@ func Queue(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Couldn't Add "+cmdInfo.Msg.Author.String()+" To Queue", errThumbURL, strings.Title(err.Error()),
 			errColor, format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"queue [queue_ID]", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"queue 1234", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 		return

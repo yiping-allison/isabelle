@@ -69,6 +69,7 @@ func main() {
 // clean will call the routine cleans for event and user tracking
 func clean(isa *isabellebot.Bot) {
 	isa.Service.Event.Clean()
+	isa.Service.Trade.Clean()
 	isa.Service.User.Clean()
 }
 

@@ -62,7 +62,8 @@ func Trade(cmdInfo CommandInfo) {
 	// Add trade event
 	cmdInfo.Service.Trade.AddTrade(id, user)
 	// Add trade tracking to user
-	cmdInfo.Service.User.AddTrade(user, id)
+	expire := cmdInfo.Service.Trade.GetExpiration(id)
+	cmdInfo.Service.User.AddTrade(user, id, expire)
 
 	// retrieve reps from database
 	reps := cmdInfo.Service.Rep.GetRep(user.ID)

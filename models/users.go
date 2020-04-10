@@ -16,7 +16,7 @@ const (
 	MaxEvent int = 1
 
 	// MaxTrade limits the amount of trades a user can create
-	MaxTrade int = 2
+	MaxTrade int = 5
 )
 
 // UserService wraps to the User interface
@@ -27,7 +27,7 @@ type UserService interface {
 // User defines all the methods we can use to interact with
 // the User Service
 type User interface {
-	AddTrade(user *discordgo.User, tradeID string)
+	AddTrade(user *discordgo.User, tradeID string, expire time.Time)
 	UserExists(user *discordgo.User) bool
 	AddUser(user *discordgo.User) error
 	AddEvent(user *discordgo.User, eventID string, expire time.Time)
@@ -64,6 +64,7 @@ type tQueue struct {
 // Trades defines a trade event
 type Trades struct {
 	tradeID string
+	expire  time.Time
 }
 
 // UserData represents user data bot needs to keep track of
@@ -92,11 +93,12 @@ func (us userStore) RemoveTrade(tradeID string, user *discordgo.User) {
 }
 
 // AddTrade will add a trade event to user tracking
-func (us userStore) AddTrade(user *discordgo.User, tradeID string) {
+func (us userStore) AddTrade(user *discordgo.User, tradeID string, expire time.Time) {
 	us.m.Lock()
 	defer us.m.Unlock()
 	new := Trades{
 		tradeID: tradeID,
+		expire:  expire,
 	}
 	val := us.user[user.ID]
 	val.trades = append(val.trades, new)
@@ -265,7 +267,9 @@ func (us userStore) Clean() {
 	defer us.m.Unlock()
 	var newE []tEvent
 	var newQ []tQueue
+	var newT []Trades
 	for k, v := range us.user {
+		// remove events
 		for _, event := range v.events {
 			if time.Now().Sub(event.expire) > 0 {
 				// remove this event
@@ -274,6 +278,7 @@ func (us userStore) Clean() {
 			newE = append(newE, event)
 		}
 		us.user[k].events = newE
+		// remove queues
 		for _, queue := range v.queues {
 			if time.Now().Sub(queue.expire) > 0 {
 				// remove this queue
@@ -282,5 +287,13 @@ func (us userStore) Clean() {
 			newQ = append(newQ, queue)
 		}
 		us.user[k].queues = newQ
+		// remove trades
+		for _, trade := range v.trades {
+			if time.Now().Sub(trade.expire) > 0 {
+				continue
+			}
+			newT = append(newT, trade)
+		}
+		us.user[k].trades = newT
 	}
 }
