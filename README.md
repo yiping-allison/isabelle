@@ -27,7 +27,7 @@ After, import the data using `setBugFish.psql` and `data.csv` (A easy way of doi
 
 ## Usage
 
-1. Clone or Download Repository or run `go get github.com/yiping-allison/isabelle`
+1. Clone or Download Repository or run `go get -u github.com/yiping-allison/isabelle`
 2. Configure example.config file and rename the file to: `.config`
 3. Run `go build`
 4. Run executable

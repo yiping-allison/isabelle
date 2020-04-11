@@ -16,6 +16,7 @@ type TradeService interface {
 // Trade contains all the methods we can use to interact with
 // trade data
 type Trade interface {
+	// GetOffer retrieves a trade offer (string) by tradeID and userID
 	GetOffer(tradeID, userID string) string
 
 	// Clean will remove an expired item from the map
@@ -61,8 +62,11 @@ type TradeOfferer struct {
 }
 
 type tradeStore struct {
+	// map stores by tradeID -> trade data
 	ts map[string]*TradeData
-	m  *sync.RWMutex
+
+	// mutex
+	m *sync.RWMutex
 }
 
 type tradeService struct {
@@ -71,6 +75,7 @@ type tradeService struct {
 
 var _ Trade = &tradeStore{}
 
+// GetOffer retrieves a trade offer by tradeID and userID
 func (ts tradeStore) GetOffer(tradeID, userID string) string {
 	ts.m.RLock()
 	defer ts.m.RUnlock()
@@ -101,6 +106,7 @@ func (ts tradeStore) Remove(tradeID string, user *discordgo.User) {
 	ts.ts[tradeID].Offers = removeOffer(user, ts.ts[tradeID].Offers)
 }
 
+// utility func to remove an offer from a slice of offers based on discord user
 func removeOffer(user *discordgo.User, offers []TradeOfferer) []TradeOfferer {
 	var ret []TradeOfferer
 	for _, val := range offers {

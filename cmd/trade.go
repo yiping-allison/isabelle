@@ -1,9 +1,19 @@
 package cmd
 
 import (
+	"bytes"
 	"strconv"
 	"strings"
+	"unicode"
 )
+
+type trade struct {
+	// item user is willing to trade
+	item string
+
+	// msg (preferably) about what item they're looking for to trade
+	msg string
+}
 
 // Trade will handle trade options within the server
 //
@@ -33,6 +43,20 @@ func Trade(cmdInfo CommandInfo) {
 		return
 	}
 
+	// attempt to parse command
+	t := parseTradeCmd(strings.Join(cmdInfo.CmdOps[1:], " "))
+	if t == nil {
+		// error parse failed
+		msg := cmdInfo.createMsgEmbed(
+			"Error: Couldn't Create Trade", errThumbURL, "Syntax error", errColor,
+			format(
+				createFields("Suggestion", "Try checking if you input the command correctly.", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"trade item=\"blue mountain coffee\" msg=\"looking for geisha coffee\"", false),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		return
+	}
+
 	// generate trade id
 	id := generateID(1000, 9999)
 
@@ -57,14 +81,57 @@ func Trade(cmdInfo CommandInfo) {
 	reps := cmdInfo.Service.Rep.GetRep(user.ID)
 
 	// Print Trade Offer
-	offer := strings.Join(cmdInfo.CmdOps[1:], " ")
 	msg := cmdInfo.createMsgEmbed(
 		"Trade Offer", tradeThumbURL, user.String(), tradeColor,
 		format(
 			createFields("Trade ID", id, true),
 			createFields("Reputation", strconv.Itoa(reps), true),
-			createFields("Trade Listing", offer, false),
+			createFields("Trade Listing", strings.Title(t.item), false),
+			createFields("Message", strings.Title(t.msg), false),
 		),
 	)
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+}
+
+// parseTradeCmd will take a full command string and return a trade object
+// if the command was correctly parsed
+//
+// else, nil
+func parseTradeCmd(fullCmd string) *trade {
+	f := func(r rune) bool {
+		return !unicode.IsLetter(r) && !unicode.IsNumber(r) && !unicode.IsSpace(r)
+	}
+	bytes := bytes.FieldsFunc([]byte(fullCmd), f)
+	var parsedCmd []string
+	for _, e := range bytes {
+		parsedCmd = append(parsedCmd, strings.ToLower(strings.TrimSpace(string(e))))
+	}
+	if len(parsedCmd) != 4 || !validTrade(parsedCmd) {
+		// error - syntax not parsed correctly
+		return nil
+	}
+	var t trade
+	for i := 0; i < len(parsedCmd); i += 2 {
+		if parsedCmd[i] == "item" {
+			t.item = parsedCmd[i+1]
+			continue
+		}
+		if parsedCmd[i] == "msg" {
+			t.msg = parsedCmd[i+1]
+			continue
+		}
+	}
+	return &t
+}
+
+// validTrade checks if the given command contains the two keywords:
+// item & msg
+func validTrade(cmds []string) bool {
+	var tmp []string
+	for _, i := range cmds {
+		if i == "item" || i == "msg" {
+			tmp = append(tmp, i)
+		}
+	}
+	return len(tmp) == 2
 }
