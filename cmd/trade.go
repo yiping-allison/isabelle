@@ -13,7 +13,7 @@ func Trade(cmdInfo CommandInfo) {
 	user := cmdInfo.Msg.Author
 	// if user doesn't exist in rep database, create a new one
 	if !cmdInfo.Service.Rep.Exists(user.ID) {
-		cmdInfo.newRep(user)
+		cmdInfo.newRep(user.ID)
 	}
 
 	// If the user currently doesn't exist in server tracking, make a new one
@@ -63,7 +63,7 @@ func Trade(cmdInfo CommandInfo) {
 		format(
 			createFields("Trade ID", id, true),
 			createFields("Reputation", strconv.Itoa(reps), true),
-			createFields("Offer", offer, false),
+			createFields("Trade Listing", offer, false),
 		),
 	)
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)

@@ -18,6 +18,7 @@ const (
 	checkThumbURL string = "https://cdn.discordapp.com/attachments/693564368423616562/696816758945742868/Success.png"
 	queueThumbURL string = "https://cdn.discordapp.com/attachments/693564368423616562/696802401490960505/Queue.png"
 	tradeThumbURL string = "https://cdn.discordapp.com/attachments/693564368423616562/698023785164439562/trade-icon.png"
+	thumbThumbURL string = "http://cdn.onlinewebfonts.com/svg/img_504758.png"
 )
 
 const (
@@ -28,6 +29,7 @@ const (
 	eventColor   int = 3108709
 	successColor int = 3764015
 	tradeColor   int = 15893760
+	appColor     int = 4617611
 )
 
 // CommandInfo represents all metadata discord and bot needs to
@@ -61,11 +63,11 @@ type CommandInfo struct {
 
 // newRep creates a new rep database objects and inserts it into
 // postgreSQL
-func (c CommandInfo) newRep(user *discordgo.User) {
+func (c CommandInfo) newRep(userID string) {
 	// user does not exist in rep database
 	// initialize user to 0
 	rep := models.Rep{
-		DiscordID: user.ID,
+		DiscordID: userID,
 		RepNum:    0,
 	}
 	err := c.Service.Rep.Create(&rep)

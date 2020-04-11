@@ -19,7 +19,7 @@ func Offer(cmdInfo CommandInfo) {
 	user := cmdInfo.Msg.Author
 	// if user doesn't exist in rep database, create a new one
 	if !cmdInfo.Service.Rep.Exists(user.ID) {
-		cmdInfo.newRep(user)
+		cmdInfo.newRep(user.ID)
 	}
 
 	if !cmdInfo.Service.Trade.Exists(id) {
@@ -64,7 +64,7 @@ func Offer(cmdInfo CommandInfo) {
 	embed := cmdInfo.createMsgEmbed(
 		"Successfully Added "+user.String()+"'s Offer!", checkThumbURL, "Trade ID: "+id,
 		successColor, format(
-			createFields("Offer", offer, true),
+			createFields("Offer Item", offer, true),
 			createFields("Reputation", strconv.Itoa(rep), true),
 			createFields("Suggestion", "Please Wait Until Trader Makes a Decision. Thank you!", false),
 		))
