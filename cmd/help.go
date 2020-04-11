@@ -57,6 +57,52 @@ func Help(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed("Close", helpThumbURL, "Ends events.",
 			helpColor, format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"close event 1234", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"close trade 1234", true),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
+	case "unregister":
+		msg := cmdInfo.createMsgEmbed("Unregister", helpThumbURL, "Removes yourself from listings.",
+			helpColor, format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"unregister event 1234", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"unregister trade 1234", true),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
+	case "accept":
+		msg := cmdInfo.createMsgEmbed("Accept", helpThumbURL, "Accepts reputation applications.",
+			helpColor, format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"accept 1234", true),
+				createFields("NOTE", "This command is only available to moderators.", true),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
+	case "reject":
+		msg := cmdInfo.createMsgEmbed("Reject", helpThumbURL, "Rejects reputation applications.",
+			helpColor, format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"reject 1234", true),
+				createFields("NOTE", "This command is only available to moderators.", true),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
+	case "rep":
+		msg := cmdInfo.createMsgEmbed("Rep", helpThumbURL, "Creates a new reputation application.",
+			helpColor, format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"rep @awesome-person successfully traded coffee beans", true),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
+	case "trade":
+		msg := cmdInfo.createMsgEmbed("Trade", helpThumbURL, "Creates a new trade event.",
+			helpColor, format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"trade blue mountain coffee", true),
+			))
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+
+	case "offer":
+		msg := cmdInfo.createMsgEmbed("Offer", helpThumbURL, "Provide an offer to a trade event.",
+			helpColor, format(
+				createFields("EXAMPLE", cmdInfo.Prefix+"offer 1234 geisha coffee beans", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
 

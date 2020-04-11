@@ -12,10 +12,17 @@ import (
 )
 
 type newEvent struct {
-	Name  string
-	Img   string
+	// Name of the event
+	Name string
+
+	// Link to the event image
+	Img string
+
+	// Limit specifies max amount of queue individuals for event host
 	Limit string
-	Msg   string
+
+	// Custom message set by event hosts - must be within character ranges
+	Msg string
 }
 
 const (
@@ -125,9 +132,15 @@ func Event(cmdInfo CommandInfo) {
 		return
 	}
 
+	user := cmdInfo.Msg.Author
+	// if user doesn't exist in rep database, create a new one
+	if !cmdInfo.Service.Rep.Exists(user.ID) {
+		cmdInfo.newRep(user.ID)
+	}
+
 	// if the user doesn't currently exist in tracking, create a new one
-	if !cmdInfo.Service.User.UserExists(cmdInfo.Msg.Author) {
-		cmdInfo.Service.User.AddUser(cmdInfo.Msg.Author)
+	if !cmdInfo.Service.User.UserExists(user) {
+		cmdInfo.Service.User.AddUser(user)
 	}
 
 	// generate a random id with at least 4 digits
@@ -145,10 +158,10 @@ func Event(cmdInfo CommandInfo) {
 	}
 
 	// Add the event to tracking
-	cmdInfo.Service.Event.AddEvent(cmdInfo.Msg.Author, id, limit)
+	cmdInfo.Service.Event.AddEvent(user, id, limit)
 	// record expiration time
 	expire := cmdInfo.Service.Event.GetExpiration(id)
-	cmdInfo.Service.User.AddEvent(cmdInfo.Msg.Author, id, expire)
+	cmdInfo.Service.User.AddEvent(user, id, expire)
 
 	msg := cmdInfo.createMsgEmbed(
 		"Event: "+event.Name,
@@ -156,7 +169,7 @@ func Event(cmdInfo CommandInfo) {
 		"Queue ID: "+id,
 		eventColor,
 		format(
-			createFields("Hosted By", cmdInfo.Msg.Author.String(), true),
+			createFields("Hosted By", user.String(), true),
 			createFields("Limit", event.Limit, true),
 			createFields("Message", event.Msg, false),
 		))

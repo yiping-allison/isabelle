@@ -15,14 +15,36 @@ type EventService interface {
 
 // Event represents all methods we can use to interact with Event type data
 type Event interface {
+	// AddEvent creates a new event on the server
 	AddEvent(User *discordgo.User, MsgID string, limit int)
+
+	// EventExists will check if a requested event exists currently
 	EventExists(msgID string) bool
+
+	// AddToQueue will add another user to the queue who registers as long as the
+	// queue is not full
 	AddToQueue(UserID *discordgo.User, eventID string) (*discordgo.User, error)
+
+	// GetQueue will return the current queue line
 	GetQueue(eventID string) *[]QueueUser
+
+	// Close will remove a event listing from the map
 	Close(eventID, role string, user *discordgo.User, roles []string) error
+
+	// Clean will remove event listings from the map that have exceeded time limit
+	//
+	// DO NOT CALL THIS RANDOMLY!!
+	//
+	// This should only be called in the goroutine in main (ticker to check expiration)
 	Clean()
+
+	// Remove will remove a queue individual from event based on Event ID
 	Remove(eventID string, user *discordgo.User)
+
+	// GetHost returns the original host of the event
 	GetHost(eventID string) *discordgo.User
+
+	// GetExpiration returns the expiration time of a particular event
 	GetExpiration(eventID string) time.Time
 }
 

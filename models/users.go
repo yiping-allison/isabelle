@@ -27,20 +27,62 @@ type UserService interface {
 // User defines all the methods we can use to interact with
 // the User Service
 type User interface {
+	// AddOffer adds an offer to user tracking when user offers can item to a trade event
 	AddOffer(tradeID string, user *discordgo.User, expire time.Time)
+
+	// RemoveOffer removes an offer from user tracking after user
+	// unregisters from trade event
 	RemoveOffer(tradeID string, user *discordgo.User)
+
+	// AddTrade will add a trade event to user tracking
 	AddTrade(user *discordgo.User, tradeID string, expire time.Time)
+
+	// UserExists returns a bool indicating if the requested user is
+	// already in server tracking or not
 	UserExists(user *discordgo.User) bool
+
+	// AddUser will add a new user to the map along with initialized slices
+	// for events and queues tracking
 	AddUser(user *discordgo.User) error
+
+	// AddEvent adds a new event to the user tracking events
 	AddEvent(user *discordgo.User, eventID string, expire time.Time)
+
+	// LimitEvent returns true if the user has an event list equal to the max event
+	//
+	// In otherwords, if this is true, the user should not be able to
+	// make more events
 	LimitEvent(user *discordgo.User) bool
+
+	// RemoveEvent removes an event from a user's tracking state
 	RemoveEvent(user *discordgo.User, eventID string)
+
+	// Clean will remove event listings from tracking that have exceeded time limit
+	//
+	// DO NOT CALL THIS RANDOMLY!!
+	//
+	// This should only be called in the goroutine in main (ticker to check expiration)
 	Clean()
+
+	// AddQueue adds an item to the queue
 	AddQueue(eventID string, user *discordgo.User, expire time.Time)
+
+	// LimitQueue returns true when user hit max queue amount
+	//
+	// Otherwise, it return false
 	LimitQueue(user *discordgo.User) bool
+
+	// RemoveQueue will remove an item from the queue slice
 	RemoveQueue(eventID string, user *discordgo.User)
+
+	// RemoveAllQueue will remove all events with a certain eventID from all users
 	RemoveAllQueue(eventID string)
+
+	// LimitTrade returns true when the user has reached
+	// the max amount of trade creation
 	LimitTrade(userID string) bool
+
+	// RemoveTrade removes a trade event from tracking
 	RemoveTrade(tradeID string, user *discordgo.User)
 }
 
@@ -69,6 +111,7 @@ type Trades struct {
 	expire  time.Time
 }
 
+// Offers defines offer tracking to a trade
 type Offers struct {
 	tradeID string
 	expire  time.Time

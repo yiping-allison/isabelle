@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
@@ -34,31 +33,30 @@ const (
 
 // CommandInfo represents all metadata discord and bot needs to
 // execute certain API callbacks and commands
-//
-// AdminRole: ID of the role which can control bot
-//
-// Ses: discord session (discord)
-//
-// Msg: discord message (discord)
-//
-// Service: contains all services needed by bot (bot)
-//
-// Prefix: the prefix the bot recognizes set in .config
-//
-// CmdName: contains the command name
-//
-// CmdOps: the full slice of commands (unparsed)
-//
-// CmdList: contains the names of all commands
 type CommandInfo struct {
+	// AdminRole: ID of the role which can control bot
 	AdminRole string
-	Ses       *discordgo.Session
-	Msg       *discordgo.MessageCreate
-	Service   models.Services
-	Prefix    string
-	CmdName   string
-	CmdOps    []string
-	CmdList   []string
+
+	// Ses: discord session (discord)
+	Ses *discordgo.Session
+
+	// Msg: discord message (discord)
+	Msg *discordgo.MessageCreate
+
+	// Service: contains all services needed by bot (bot)
+	Service models.Services
+
+	// Prefix: the prefix the bot recognizes set in .config
+	Prefix string
+
+	// CmdName: contains the command name
+	CmdName string
+
+	// CmdOps: the full slice of commands (unparsed)
+	CmdOps []string
+
+	// CmdList: contains the names of all commands
+	CmdList []string
 }
 
 // newRep creates a new rep database objects and inserts it into
@@ -72,7 +70,7 @@ func (c CommandInfo) newRep(userID string) {
 	}
 	err := c.Service.Rep.Create(&rep)
 	if err != nil {
-		fmt.Println("Trade(): error creating new user in database...")
+		// error creating new user in database
 		return
 	}
 }

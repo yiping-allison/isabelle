@@ -8,19 +8,30 @@ import (
 )
 
 const (
+	// ErrDiscordIDRequired is an internal error raised when
+	// no discord ID was given (primary key)
 	ErrDiscordIDRequired string = "need discord user ID"
 )
 
+// Rep defines the postgres SQL table model using
+// GORM
 type Rep struct {
 	gorm.Model
+
+	// Unique Discord ID
 	DiscordID string `gorm:"not_null;unique_index"`
-	RepNum    int    `gorm:"not_null"`
+
+	// Number of reps stored in database
+	RepNum int `gorm:"not_null"`
 }
 
+// RepService wraps to RepDB
 type RepService interface {
 	RepDB
 }
 
+// RepDB contains all methods we can use to interact with rep
+// database
 type RepDB interface {
 	// AddRep adds a repID linked with a user ID to be repped
 	// into a temp map
@@ -29,7 +40,7 @@ type RepDB interface {
 	// Clean will delete a repID event from the tmp map
 	Clean(repID string)
 
-	// Create inserts a new value into the database
+	// Create inserts a new rep value into the database
 	Create(rep *Rep) error
 
 	// Exists will check if an user is in the database
@@ -52,9 +63,14 @@ type RepDB interface {
 }
 
 type repGorm struct {
-	db      *gorm.DB
+	// gorm database connection
+	db *gorm.DB
+
+	// map is stored by repID -> discordUserID (user to be repped)
 	tmpReps map[string]string
-	m       *sync.RWMutex
+
+	// mutex lock
+	m *sync.RWMutex
 }
 
 type repService struct {
@@ -67,6 +83,7 @@ type repValidator struct {
 
 var _ RepDB = &repGorm{}
 
+// Clean will delete a repID event from the tmp map
 func (rg repGorm) Clean(repID string) {
 	rg.m.Lock()
 	defer rg.m.Unlock()

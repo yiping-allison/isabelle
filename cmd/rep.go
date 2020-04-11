@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -10,7 +9,6 @@ import (
 // Rep will allow server members to update reputation points
 // on another member
 func Rep(cmdInfo CommandInfo) {
-	fmt.Println(cmdInfo.CmdOps[1:])
 	userID := stripPing(cmdInfo.CmdOps[1])
 	if !cmdInfo.Service.Rep.Exists(userID) {
 		// if the user doesn't exist in rep database, create a new one
@@ -26,7 +24,7 @@ func Rep(cmdInfo CommandInfo) {
 		appColor, format(
 			createFields("Nominee", mentionUser(userID), true),
 			createFields("Message", userMsg, true),
-			createFields("Suggestion", "The mods will try to process this app ASAP. Thank you for submitting!", false),
+			createFields("Note", "The mods will try to process this app ASAP. Thank you for submitting!", false),
 		))
 	cplx := &discordgo.MessageSend{
 		Content: mentionRole(cmdInfo.AdminRole) + ": New Reputation App!",

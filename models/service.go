@@ -8,11 +8,22 @@ import (
 
 // Services handles services for bot
 type Services struct {
-	db    *gorm.DB
+	// gorm database connection
+	db *gorm.DB
+
+	// Gateway to EntryService methods
 	Entry EntryService
+
+	// Gateway to EventService methods
 	Event EventService
-	User  UserService
-	Rep   RepService
+
+	// Gateway to UserService methods
+	User UserService
+
+	// Gateway to RepService methods
+	Rep RepService
+
+	// Gateway to TradeService methods
 	Trade TradeService
 }
 

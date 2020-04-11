@@ -1,7 +1,5 @@
 package cmd
 
-import "fmt"
-
 // Accept will allow moderators (or bot controllers) to accept
 // reputation application requests
 //
@@ -19,12 +17,13 @@ func Accept(cmdInfo CommandInfo) {
 	userID := cmdInfo.Service.Rep.GetUser(repID)
 	if !cmdInfo.Service.Rep.Exists(userID) {
 		// if someone has been repped, they need to have an event or trade already...
-		// this case shouldn't be possible so we automatically reject
+		// new events and trades individuals are initialized to 0 previously
+		// this case shouldn't be repped so we automatically reject
 		return
 	}
 	err := cmdInfo.Service.Rep.Increase(userID)
 	if err != nil {
-		fmt.Println("error updating individual...")
+		// error updating individual
 		return
 	}
 	// clean temp map

@@ -13,11 +13,20 @@ import (
 
 // Bot represents a daisymae bot instance
 type Bot struct {
+	// AdminRole contains the role ID of the discord server's admin role
 	AdminRole string
-	DS        *discordgo.Session
-	Service   models.Services
-	Prefix    string
-	Commands  map[string]Command
+
+	// DS represents the bot's current discord session
+	DS *discordgo.Session
+
+	// Service is the gateway to all Service interactions
+	Service models.Services
+
+	// Prefix is the user set bot prefix found in .config (default is ?)
+	Prefix string
+
+	// Commands is a map of command name to a closure of the func
+	Commands map[string]Command
 }
 
 // New creates a new daisymae bot instance and loads bot commands.
