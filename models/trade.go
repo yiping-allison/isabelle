@@ -45,20 +45,31 @@ type Trade interface {
 
 	// Remove removes a user's offer from a tradeID
 	Remove(tradeID string, user *discordgo.User)
+
+	// GetAllOffers will return a slice of all trade offers associated with the tradeID
+	GetAllOffers(tradeID string) []TradeOfferer
 }
 
 // TradeData represents all data needed to keep
 // track of a trade event
 type TradeData struct {
+	// User info of trade host
 	DiscordUser *discordgo.User
-	Expiration  time.Time
-	Offers      []TradeOfferer
+
+	// time the trade event will expire
+	Expiration time.Time
+
+	// slice of offer related data associated with tradeID
+	Offers []TradeOfferer
 }
 
 // TradeOfferer defines someone offering a response to a trade
 type TradeOfferer struct {
-	user  *discordgo.User
-	offer string
+	// User contains the discord user info of user offering to a trade
+	User *discordgo.User
+
+	// What the user is offering in string format
+	Offer string
 }
 
 type tradeStore struct {
@@ -75,14 +86,22 @@ type tradeService struct {
 
 var _ Trade = &tradeStore{}
 
+// GetAllOffers will return a slice of all trade offers associated with the tradeID
+func (ts tradeStore) GetAllOffers(tradeID string) []TradeOfferer {
+	ts.m.RLock()
+	defer ts.m.RUnlock()
+	val := ts.ts[tradeID]
+	return val.Offers
+}
+
 // GetOffer retrieves a trade offer by tradeID and userID
 func (ts tradeStore) GetOffer(tradeID, userID string) string {
 	ts.m.RLock()
 	defer ts.m.RUnlock()
 	val := ts.ts[tradeID].Offers
 	for _, v := range val {
-		if v.user.ID == userID {
-			return v.offer
+		if v.User.ID == userID {
+			return v.Offer
 		}
 	}
 	return ""
@@ -110,7 +129,7 @@ func (ts tradeStore) Remove(tradeID string, user *discordgo.User) {
 func removeOffer(user *discordgo.User, offers []TradeOfferer) []TradeOfferer {
 	var ret []TradeOfferer
 	for _, val := range offers {
-		if val.user.ID == user.ID {
+		if val.User.ID == user.ID {
 			continue
 		}
 		ret = append(ret, val)
@@ -132,8 +151,8 @@ func (ts tradeStore) AddOffer(tradeID, tradeOffer string, user *discordgo.User) 
 	ts.m.Lock()
 	defer ts.m.Unlock()
 	new := TradeOfferer{
-		user:  user,
-		offer: tradeOffer,
+		User:  user,
+		Offer: tradeOffer,
 	}
 	val := ts.ts[tradeID]
 	if containsUser(user, val.Offers) {
@@ -146,9 +165,10 @@ func (ts tradeStore) AddOffer(tradeID, tradeOffer string, user *discordgo.User) 
 	return nil
 }
 
+// containsUser returns true if a user is found in the slice of offerers
 func containsUser(user *discordgo.User, offers []TradeOfferer) bool {
 	for _, u := range offers {
-		if user.ID == u.user.ID {
+		if user.ID == u.User.ID {
 			return true
 		}
 	}

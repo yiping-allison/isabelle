@@ -67,6 +67,7 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 	embed := cmdInfo.createMsgEmbed(
 		"Successfully Removed Event "+eventID+" from listings!", checkThumbURL, "Thank you for hosting!",
 		successColor, format(
+			createFields("Host", host.Mention(), true),
 			createFields("Suggestion", "If you are planning on opening another event, it is safe to do so now.", false),
 			createFields("Suggestion", "If your event was deleted by a moderator, please make sure to follow event guidelines.", false),
 		))
@@ -76,7 +77,6 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 // closeTrade is a helper func which closes a trade event and
 // removes all trade tracking from the original user
 func closeTrade(tradeID string, cmdInfo CommandInfo) {
-	// REVIEW: Do I need to add trade tracking per user?
 	if !cmdInfo.Service.Trade.Exists(tradeID) {
 		// error - trade event doesn't exist
 		msg := cmdInfo.createMsgEmbed(
@@ -109,6 +109,7 @@ func closeTrade(tradeID string, cmdInfo CommandInfo) {
 	embed := cmdInfo.createMsgEmbed(
 		"Successfully Removed Trade "+tradeID+" from listings!", checkThumbURL, "Thank you for hosting!",
 		successColor, format(
+			createFields("Host", host.Mention(), true),
 			createFields("Suggestion", "If you are planning on opening another trade, it is safe to do so now.", false),
 			createFields("Suggestion", "If your trade was deleted by a moderator, please make sure to follow trade guidelines.", false),
 		))

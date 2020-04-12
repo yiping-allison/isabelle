@@ -5,6 +5,9 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/yiping-allison/isabelle/models"
 )
 
 type trade struct {
@@ -21,6 +24,14 @@ type trade struct {
 // for members to trade and offer items among each other
 func Trade(cmdInfo CommandInfo) {
 	user := cmdInfo.Msg.Author
+
+	if _, err := strconv.Atoi(cmdInfo.CmdOps[1]); err == nil {
+		// This is a list command - print all currently offered to tradeID
+		offers := cmdInfo.Service.Trade.GetAllOffers(cmdInfo.CmdOps[1])
+		printTradeList(offers, cmdInfo, cmdInfo.CmdOps[1])
+		return
+	}
+
 	// if user doesn't exist in rep database, create a new one
 	if !cmdInfo.Service.Rep.Exists(user.ID) {
 		cmdInfo.newRep(user.ID)
@@ -82,7 +93,7 @@ func Trade(cmdInfo CommandInfo) {
 
 	// Print Trade Offer
 	msg := cmdInfo.createMsgEmbed(
-		"Trade Offer", tradeThumbURL, user.String(), tradeColor,
+		"Trade", tradeThumbURL, user.Mention(), tradeColor,
 		format(
 			createFields("Trade ID", id, true),
 			createFields("Reputation", strconv.Itoa(reps), true),
@@ -91,6 +102,22 @@ func Trade(cmdInfo CommandInfo) {
 		),
 	)
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+}
+
+// printTradeList handles printing large amounts of trade offers (since trade offers has no limit)
+func printTradeList(offers []models.TradeOfferer, cmdInfo CommandInfo, tradeID string) {
+	var fields []*discordgo.MessageEmbedField
+	for _, o := range offers {
+		fields = append(fields, createFields(o.User.String(), o.Offer, true))
+	}
+	for i := 0; i < len(fields); i += 15 {
+		j := i + 15
+		if j > len(fields) {
+			j = len(fields)
+		}
+		msg := cmdInfo.createMsgEmbed("Total Offers", tradeThumbURL, "TradeID: "+tradeID, tradeColor, fields[i:j])
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+	}
 }
 
 // parseTradeCmd will take a full command string and return a trade object

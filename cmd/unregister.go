@@ -48,8 +48,9 @@ func (c CommandInfo) removeFromEvent(eventID string, user *discordgo.User) {
 
 	// successfully removed user
 	msg := c.createMsgEmbed(
-		"Removed "+c.Msg.Author.String()+" from Event", checkThumbURL, "Queue ID: "+c.CmdOps[2],
+		"Removed from Event", checkThumbURL, "Queue ID: "+c.CmdOps[2],
 		successColor, format(
+			createFields("User", user.Mention(), true),
 			createFields("Suggestion", "Feel free to queue for any other events or create your own.", false),
 		))
 	c.Ses.ChannelMessageSendEmbed(c.Msg.ChannelID, msg)
@@ -76,9 +77,10 @@ func (c CommandInfo) removeFromTrade(tradeID string, user *discordgo.User) {
 
 	// successfully removed user
 	msg := c.createMsgEmbed(
-		c.Msg.Author.String()+" Withdrew From Trade", checkThumbURL, "Trade ID: "+tradeID,
+		"User Withdrew From Trade", checkThumbURL, "Trade ID: "+tradeID,
 		successColor, format(
-			createFields("Offer", offer, false),
+			createFields("User", user.Mention(), true),
+			createFields("Offer", offer, true),
 			createFields("Suggestion", "Feel free to offer for any other trades or create your own.", false),
 		))
 	c.Ses.ChannelMessageSendEmbed(c.Msg.ChannelID, msg)

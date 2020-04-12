@@ -31,7 +31,8 @@ func Queue(cmdInfo CommandInfo) {
 		return
 	}
 
-	if cmdInfo.Service.User.LimitQueue(cmdInfo.Msg.Author) {
+	user := cmdInfo.Msg.Author
+	if cmdInfo.Service.User.LimitQueue(user) {
 		// Error - max queue reached
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Max Queue reached", errThumbURL, "You already reached the max queue.",
@@ -43,12 +44,13 @@ func Queue(cmdInfo CommandInfo) {
 	}
 
 	// Add user to queue
-	host, err := cmdInfo.Service.Event.AddToQueue(cmdInfo.Msg.Author, cmdInfo.CmdOps[1])
+	host, err := cmdInfo.Service.Event.AddToQueue(user, cmdInfo.CmdOps[1])
 	if err != nil {
 		// Check error
 		msg := cmdInfo.createMsgEmbed(
-			"Error: Couldn't Add "+cmdInfo.Msg.Author.String()+" To Queue", errThumbURL, strings.Title(err.Error()),
+			"Error: Couldn't Add To Queue", errThumbURL, strings.Title(err.Error()),
 			errColor, format(
+				createFields("User", user.Mention(), true),
 				createFields("EXAMPLE", cmdInfo.Prefix+"queue 1234", true),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
@@ -56,16 +58,17 @@ func Queue(cmdInfo CommandInfo) {
 	}
 
 	// if user doesn't exist in user tracking, create a new one
-	if !cmdInfo.Service.User.UserExists(cmdInfo.Msg.Author) {
-		cmdInfo.Service.User.AddUser(cmdInfo.Msg.Author)
+	if !cmdInfo.Service.User.UserExists(user) {
+		cmdInfo.Service.User.AddUser(user)
 	}
 
 	// Add queue to user tracking
-	cmdInfo.Service.User.AddQueue(cmdInfo.CmdOps[1], cmdInfo.Msg.Author, cmdInfo.Service.Event.GetExpiration(cmdInfo.CmdOps[1]))
+	cmdInfo.Service.User.AddQueue(cmdInfo.CmdOps[1], user, cmdInfo.Service.Event.GetExpiration(cmdInfo.CmdOps[1]))
 
 	embed := cmdInfo.createMsgEmbed(
-		"Successfully Added "+cmdInfo.Msg.Author.String()+" to Queue!", checkThumbURL, "Queue ID: "+cmdInfo.CmdOps[1],
+		"Successfully Added to Queue!", checkThumbURL, "Queue ID: "+cmdInfo.CmdOps[1],
 		successColor, format(
+			createFields("User", user.Mention(), true),
 			createFields("Please Wait Until You're Pinged or Messaged!", "Thank you!", true),
 		))
 	cplx := &discordgo.MessageSend{

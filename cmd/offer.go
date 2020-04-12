@@ -40,8 +40,9 @@ func Offer(cmdInfo CommandInfo) {
 	if err != nil {
 		// error - user already offered
 		msg := cmdInfo.createMsgEmbed(
-			"Error: Couldn't Add "+user.String()+" To Trade", errThumbURL, strings.Title(err.Error()),
+			"Error: Couldn't Add To Trade", errThumbURL, strings.Title(err.Error()),
 			errColor, format(
+				createFields("User", user.Mention(), true),
 				createFields("Suggestion", "You can remove your existing offer and try again.", false),
 			))
 		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
@@ -62,8 +63,9 @@ func Offer(cmdInfo CommandInfo) {
 	rep := cmdInfo.Service.Rep.GetRep(user.ID)
 	// print success msg
 	embed := cmdInfo.createMsgEmbed(
-		"Successfully Added "+user.String()+"'s Offer!", checkThumbURL, "Trade ID: "+id,
+		"Successfully Added Offer!", checkThumbURL, "Trade ID: "+id,
 		successColor, format(
+			createFields("Offerer", user.Mention(), true),
 			createFields("Offer Item", offer, true),
 			createFields("Reputation", strconv.Itoa(rep), true),
 			createFields("Suggestion", "Please Wait Until Trader Makes a Decision. Thank you!", false),

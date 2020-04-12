@@ -81,6 +81,8 @@ func Event(cmdInfo CommandInfo) {
 		event = parseCmd(cmd, "DIY", diyURL)
 	case "meteor":
 		event = parseCmd(cmd, "Meteor Shower", meteorURL)
+	case "turnip":
+		event = parseCmd(cmd, "Turnip - High Sell Price", daisymaeURL)
 	default:
 		return
 	}
@@ -169,7 +171,7 @@ func Event(cmdInfo CommandInfo) {
 		"Queue ID: "+id,
 		eventColor,
 		format(
-			createFields("Hosted By", user.String(), true),
+			createFields("Hosted By", user.Mention(), true),
 			createFields("Limit", event.Limit, true),
 			createFields("Message", event.Msg, false),
 		))
