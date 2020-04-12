@@ -8,10 +8,26 @@ import (
 
 // BotConfig represents bot configurations
 type BotConfig struct {
-	BotKey    string         `json:"botKey"`
-	BotPrefix string         `json:"botPrefix"`
-	Database  PostgresConfig `json:"database"`
-	AdminRole string         `json:"adminRole"`
+	// Discord bot key
+	BotKey string `json:"botKey"`
+
+	// User set bot prefix
+	BotPrefix string `json:"botPrefix"`
+
+	// PostgreSQL configuration
+	Database PostgresConfig `json:"database"`
+
+	// ID of admin role from discord
+	AdminRole string `json:"adminRole"`
+
+	// ID of channel to post listings
+	ListingID string `json:"listingID"`
+
+	// ID of channel to place bot commands
+	BotChID string `json:"botChID"`
+
+	// ID of Channel to post application listings
+	AppID string `json:"appID"`
 }
 
 // PostgresConfig represents metadata required to start and maintain postgres

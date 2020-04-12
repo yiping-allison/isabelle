@@ -33,11 +33,11 @@ func Search(cmdInfo CommandInfo) {
 		if len(fields) == 0 {
 			// If no similar entries were found
 			msg := cmdInfo.createMsgEmbed(searchItem, errThumbURL, "No similar entries found.", errColor, fields)
-			cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+			cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 			return
 		}
 		msg := cmdInfo.createMsgEmbed(searchItem, errThumbURL, "Entry Not Found in Database... Perhaps you meant...?", errColor, fields)
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 	nHemi, sHemi := parseHemi(entry.NorthSt, entry.NorthEnd, entry.SouthSt, entry.SouthEnd)
@@ -49,7 +49,7 @@ func Search(cmdInfo CommandInfo) {
 		createFields("Southern Hemisphere", sHemi, false),
 	)
 	msg := cmdInfo.createMsgEmbed(searchItem, entry.Image, strings.Title(entry.Type), searchColor, fields)
-	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 }
 
 // Utility func which returns true when the given slice
@@ -105,7 +105,7 @@ func massPrint(fields []*discordgo.MessageEmbedField, title, desc string, cmdInf
 			j = len(fields)
 		}
 		msg := cmdInfo.createMsgEmbed(title, blobSThumbURL, desc, searchColor, fields[i:j])
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 	}
 }
 

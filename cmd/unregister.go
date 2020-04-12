@@ -14,9 +14,9 @@ func Unregister(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Wrong Arguments", errThumbURL, "Try checking your syntax.", errColor,
 			format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"unregister event [event ID]", false),
+				createFields("EXAMPLE", cmdInfo.Prefix+"unregister event 1234", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 	args := cmdInfo.CmdOps[1:]
@@ -37,7 +37,7 @@ func (c CommandInfo) removeFromEvent(eventID string, user *discordgo.User) {
 			format(
 				createFields("Suggestion", "Try checking if you supplied the correct Event ID", false),
 			))
-		c.Ses.ChannelMessageSendEmbed(c.Msg.ChannelID, msg)
+		c.Ses.ChannelMessageSendEmbed(c.BotChID, msg)
 		return
 	}
 
@@ -53,7 +53,7 @@ func (c CommandInfo) removeFromEvent(eventID string, user *discordgo.User) {
 			createFields("User", user.Mention(), true),
 			createFields("Suggestion", "Feel free to queue for any other events or create your own.", false),
 		))
-	c.Ses.ChannelMessageSendEmbed(c.Msg.ChannelID, msg)
+	c.Ses.ChannelMessageSendEmbed(c.BotChID, msg)
 }
 
 // helper func to remove user's offer from trade event
@@ -65,7 +65,7 @@ func (c CommandInfo) removeFromTrade(tradeID string, user *discordgo.User) {
 			format(
 				createFields("Suggestion", "Try checking if you supplied the correct Trade ID", false),
 			))
-		c.Ses.ChannelMessageSendEmbed(c.Msg.ChannelID, msg)
+		c.Ses.ChannelMessageSendEmbed(c.BotChID, msg)
 		return
 	}
 
@@ -83,5 +83,5 @@ func (c CommandInfo) removeFromTrade(tradeID string, user *discordgo.User) {
 			createFields("Offer", offer, true),
 			createFields("Suggestion", "Feel free to offer for any other trades or create your own.", false),
 		))
-	c.Ses.ChannelMessageSendEmbed(c.Msg.ChannelID, msg)
+	c.Ses.ChannelMessageSendEmbed(c.BotChID, msg)
 }

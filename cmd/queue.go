@@ -14,9 +14,9 @@ func Queue(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Syntax", errThumbURL, "Not enough arguments supplied.",
 			errColor, format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"queue [queue_ID]", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"queue 1234", true),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -25,9 +25,9 @@ func Queue(cmdInfo CommandInfo) {
 		msg := cmdInfo.createMsgEmbed(
 			"Error: Event Not Found", errThumbURL, "ID: "+cmdInfo.CmdOps[1],
 			errColor, format(
-				createFields("EXAMPLE", cmdInfo.Prefix+"queue [queue_ID]", true),
+				createFields("EXAMPLE", cmdInfo.Prefix+"queue 1234", true),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -39,7 +39,7 @@ func Queue(cmdInfo CommandInfo) {
 			errColor, format(
 				createFields("Suggestion", "Remove a queue before trying to add another queue.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -53,7 +53,7 @@ func Queue(cmdInfo CommandInfo) {
 				createFields("User", user.Mention(), true),
 				createFields("EXAMPLE", cmdInfo.Prefix+"queue 1234", true),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -75,5 +75,5 @@ func Queue(cmdInfo CommandInfo) {
 		Content: host.Mention() + ": A new person has joined your queue!",
 		Embed:   embed,
 	}
-	cmdInfo.Ses.ChannelMessageSendComplex(cmdInfo.Msg.ChannelID, cplx)
+	cmdInfo.Ses.ChannelMessageSendComplex(cmdInfo.BotChID, cplx)
 }

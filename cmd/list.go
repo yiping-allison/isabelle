@@ -17,5 +17,5 @@ func List(cmdInfo CommandInfo) {
 		createFields("rep", cmdInfo.Prefix+"rep ...", true),
 	)
 	msg := cmdInfo.createMsgEmbed("Commands", listThumbURL, "", listColor, fields)
-	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 }

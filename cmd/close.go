@@ -16,7 +16,7 @@ func Close(cmdInfo CommandInfo) {
 				createFields("EXAMPLE", cmdInfo.Prefix+"close event 1234", true),
 				createFields("EXAMPLE", cmdInfo.Prefix+"close trade 1234", true),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -38,7 +38,7 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 			format(
 				createFields("Suggestion", "Try checking if you supplied a valid Event ID.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -54,7 +54,7 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 			format(
 				createFields("Suggestion", "Try checking if you supplied the right Event ID.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -71,7 +71,7 @@ func closeEvent(eventID string, cmdInfo CommandInfo) {
 			createFields("Suggestion", "If you are planning on opening another event, it is safe to do so now.", false),
 			createFields("Suggestion", "If your event was deleted by a moderator, please make sure to follow event guidelines.", false),
 		))
-	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, embed)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.ListingID, embed)
 }
 
 // closeTrade is a helper func which closes a trade event and
@@ -84,7 +84,7 @@ func closeTrade(tradeID string, cmdInfo CommandInfo) {
 			format(
 				createFields("Suggestion", "Try checking if you supplied a valid Trade ID.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -99,7 +99,7 @@ func closeTrade(tradeID string, cmdInfo CommandInfo) {
 			format(
 				createFields("Suggestion", "Try checking if you supplied the right Trade ID.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 	// remove host from user tracking
@@ -113,5 +113,5 @@ func closeTrade(tradeID string, cmdInfo CommandInfo) {
 			createFields("Suggestion", "If you are planning on opening another trade, it is safe to do so now.", false),
 			createFields("Suggestion", "If your trade was deleted by a moderator, please make sure to follow trade guidelines.", false),
 		))
-	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, embed)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.ListingID, embed)
 }

@@ -43,7 +43,7 @@ func Event(cmdInfo CommandInfo) {
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"2\" msg=\"bonsai tree recipe\"", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -56,14 +56,14 @@ func Event(cmdInfo CommandInfo) {
 				format(
 					createFields("EXAMPLE", cmdInfo.Prefix+"event 1234", false),
 				))
-			cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+			cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 			return
 		}
 		queue := cmdInfo.Service.Event.GetQueue(cmdInfo.CmdOps[1])
 		fields := queueToFields(queue)
 		msg := cmdInfo.createMsgEmbed(
 			"Current Queue", queueThumbURL, "Queue ID: "+cmdInfo.CmdOps[1], eventColor, fields)
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -95,7 +95,7 @@ func Event(cmdInfo CommandInfo) {
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"5\" msg=\"ironwood bed\"", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -108,7 +108,7 @@ func Event(cmdInfo CommandInfo) {
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"5\" msg=\"ironwood bed\"", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -119,7 +119,7 @@ func Event(cmdInfo CommandInfo) {
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"5\" msg=\"ironwood bed\"", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -130,7 +130,7 @@ func Event(cmdInfo CommandInfo) {
 			format(
 				createFields("Suggestion", "Either end one of your events or wait until your events are finished before creating another.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -155,7 +155,7 @@ func Event(cmdInfo CommandInfo) {
 			format(
 				createFields("EXAMPLE", cmdInfo.Prefix+"event diy limit=\"5\" msg=\"ironwood bed\"", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -175,7 +175,7 @@ func Event(cmdInfo CommandInfo) {
 			createFields("Limit", event.Limit, true),
 			createFields("Message", event.Msg, false),
 		))
-	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.ListingID, msg)
 }
 
 // validMsg checks if a message is within text length

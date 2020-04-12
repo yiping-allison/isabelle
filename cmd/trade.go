@@ -50,7 +50,7 @@ func Trade(cmdInfo CommandInfo) {
 			format(
 				createFields("Suggestion", "Either end one of your trades or wait until they are finished before creating another.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -64,7 +64,7 @@ func Trade(cmdInfo CommandInfo) {
 				createFields("Suggestion", "Try checking if you input the command correctly.", false),
 				createFields("EXAMPLE", cmdInfo.Prefix+"trade item=\"blue mountain coffee\" msg=\"looking for geisha coffee\"", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -78,7 +78,7 @@ func Trade(cmdInfo CommandInfo) {
 			format(
 				createFields("Suggestion", "Try re-creating the trade event.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -101,7 +101,7 @@ func Trade(cmdInfo CommandInfo) {
 			createFields("Message", strings.Title(t.msg), false),
 		),
 	)
-	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.ListingID, msg)
 }
 
 // printTradeList handles printing large amounts of trade offers (since trade offers has no limit)
@@ -116,7 +116,7 @@ func printTradeList(offers []models.TradeOfferer, cmdInfo CommandInfo, tradeID s
 			j = len(fields)
 		}
 		msg := cmdInfo.createMsgEmbed("Total Offers", tradeThumbURL, "TradeID: "+tradeID, tradeColor, fields[i:j])
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 	}
 }
 

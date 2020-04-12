@@ -33,7 +33,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	isa, err := isabellebot.New(bc.BotKey, bc.AdminRole)
+	isa, err := isabellebot.New(bc.BotKey, bc.AdminRole, bc.ListingID, bc.BotChID, bc.AppID)
 	if err != nil {
 		fmt.Printf("%s", err)
 		return

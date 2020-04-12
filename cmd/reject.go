@@ -20,5 +20,5 @@ func Reject(cmdInfo CommandInfo) {
 			createFields("Sorry, we think there's something wrong.", mentionUser(userID), true),
 			createFields("Suggestion", "If this is a mistake, please PM the mods, thanks!", true),
 		))
-	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, embed)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.AppID, embed)
 }

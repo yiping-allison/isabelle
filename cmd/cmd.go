@@ -46,6 +46,15 @@ type CommandInfo struct {
 	// Service: contains all services needed by bot (bot)
 	Service models.Services
 
+	// Channel ID to post event notices
+	ListingID string
+
+	// Channel ID to post general bot commands
+	BotChID string
+
+	// Channel ID of rep applications
+	AppID string
+
 	// Prefix: the prefix the bot recognizes set in .config
 	Prefix string
 

@@ -34,7 +34,7 @@ func Accept(cmdInfo CommandInfo) {
 		successColor, format(
 			createFields("Congratulations, your rep has increased!", mentionUser(userID), true),
 		))
-	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, embed)
+	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.AppID, embed)
 }
 
 // isAdmin is a helper func which returns true if role container

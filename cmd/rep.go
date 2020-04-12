@@ -30,7 +30,7 @@ func Rep(cmdInfo CommandInfo) {
 		Content: mentionRole(cmdInfo.AdminRole) + ": New Reputation App!",
 		Embed:   msg,
 	}
-	cmdInfo.Ses.ChannelMessageSendComplex(cmdInfo.Msg.ChannelID, cplx)
+	cmdInfo.Ses.ChannelMessageSendComplex(cmdInfo.AppID, cplx)
 }
 
 // mentionUser is a helper func which mentions a user by ID

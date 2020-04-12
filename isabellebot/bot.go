@@ -27,13 +27,22 @@ type Bot struct {
 
 	// Commands is a map of command name to a closure of the func
 	Commands map[string]Command
+
+	// ID of channel to post listings
+	Listing string
+
+	// ID of channel to accept bot commands
+	BotCh string
+
+	// Channel ID of rep applications
+	App string
 }
 
 // New creates a new daisymae bot instance and loads bot commands.
 //
 // It will return the finished bot and nil upon success or
 // empty bot and err upon failure
-func New(botKey, admin string) (*Bot, error) {
+func New(botKey, admin, listing, botCh, app string) (*Bot, error) {
 	if botKey == "" {
 		return nil, errors.New("isabellebot: you need to input a botKey in the .config file")
 	}
@@ -49,6 +58,9 @@ func New(botKey, admin string) (*Bot, error) {
 		DS:        discord,
 		Service:   models.Services{},
 		Commands:  cmds,
+		Listing:   listing,
+		BotCh:     botCh,
+		App:       app,
 	}
 	isa.compileCommands()
 	// Add Handlers
@@ -90,10 +102,15 @@ type Command struct {
 //
 // ?search help
 func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.ChannelID != b.BotCh {
+		// Command must be posted in bot channel; if not, command won't be processed
+		return
+	}
 	cmds := regexp.MustCompile("\\s+").Split(m.Content[len(b.Prefix):], -1)
 	trim := strings.TrimPrefix(cmds[0], b.Prefix)
 	res := b.find(trim)
 	if res == nil {
+		// Command not found
 		return
 	}
 	var commands []string
@@ -105,6 +122,9 @@ func (b *Bot) processCmd(s *discordgo.Session, m *discordgo.MessageCreate) {
 		Ses:       s,
 		Msg:       m,
 		Service:   b.Service,
+		ListingID: b.Listing,
+		BotChID:   b.BotCh,
+		AppID:     b.App,
 		Prefix:    b.Prefix,
 		CmdName:   trim,
 		CmdOps:    cmds,

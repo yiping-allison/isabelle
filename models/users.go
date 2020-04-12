@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -187,7 +186,6 @@ func (us userStore) AddTrade(user *discordgo.User, tradeID string, expire time.T
 func (us userStore) LimitTrade(userID string) bool {
 	us.m.RLock()
 	defer us.m.RUnlock()
-	fmt.Println(userID)
 	val := us.user[userID]
 	if len(val.trades) == 0 {
 		return false

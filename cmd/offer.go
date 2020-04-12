@@ -29,7 +29,7 @@ func Offer(cmdInfo CommandInfo) {
 			errColor, format(
 				createFields("Suggestion", "Try checking if you supplied the correct Trade ID.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 	offer := strings.Join(cmdInfo.CmdOps[2:], " ")
@@ -45,7 +45,7 @@ func Offer(cmdInfo CommandInfo) {
 				createFields("User", user.Mention(), true),
 				createFields("Suggestion", "You can remove your existing offer and try again.", false),
 			))
-		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.Msg.ChannelID, msg)
+		cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.BotChID, msg)
 		return
 	}
 
@@ -74,5 +74,5 @@ func Offer(cmdInfo CommandInfo) {
 		Content: host.Mention() + ": A new person has offered to your trade!",
 		Embed:   embed,
 	}
-	cmdInfo.Ses.ChannelMessageSendComplex(cmdInfo.Msg.ChannelID, cplx)
+	cmdInfo.Ses.ChannelMessageSendComplex(cmdInfo.BotChID, cplx)
 }
