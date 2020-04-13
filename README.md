@@ -2,7 +2,7 @@
 
 ## Animal Crossing New Horizons Discord Bot
 
-**Isabelle** is a discord bot specifically for Animal Crossing New Horizons made with [DiscordGo](https://github.com/bwmarrin/discordgo). The goal is to make server and game interactions for a discord server easier! (It's also a good way for me to practice Go ;) )
+**Isabelle** is an Animal Crossing: New Horizons discord bot made with [DiscordGo](https://github.com/bwmarrin/discordgo). The goal is to make community and game interactions for a discord server easier! (It's also a good way for me to practice Go ;) )
 
 **NOTE:** I am not planning on making Isabelle into a moderation bot as there are a lot of good ones existing
 at the moment! Thanks!
@@ -12,25 +12,22 @@ in the [wiki](https://github.com/yiping-allison/isabelle/wiki).
 
 ---
 
-## Preliminary Requirements
+## Detailed Documentation and Guides
 
-This bot uses [PostgreSQL](https://www.postgresql.org/) to store data on _New Horizons'_ bug and fish. Make sure to set the database
-up or the bot will show error messages.
+**Isabelle** has her own [wiki page](https://github.com/yiping-allison/isabelle/wiki) where I included setup instructions and command documentation.
 
-To setup postgres, [download](https://www.postgresql.org/download/) the binary for your system, and setup a user account.
-
-After, import the data using `setBugFish.psql` and `data.csv` (A easy way of doing this is using `pwd` and then append `data.csv`). If the database works by then, the code will handle everything else.
+Please read the wiki before asking me any questions, thanks!
 
 **Please NOTE:** The bot is still under development so files are continually changing; Current files are subject to change.
 
 ---
 
-## Usage
+## Main Usage
 
-1. Clone or Download Repository or run `go get -u github.com/yiping-allison/isabelle`
+1. Clone, download, or run `go get -u github.com/yiping-allison/isabelle`
 2. Configure example.config file and rename the file to: `.config`
-3. Run `go build`
-4. Run executable
+3. Run `go build -o isabelle.exe`
+4. Run executable using `./isabelle.exe`
 
 ## Bugs & Contributing
 
@@ -39,3 +36,9 @@ This is my first time writing a discord bot! I welcome any help or bug reports!
 ## Contributions
 
 * Developers of [DiscordGo](https://github.com/bwmarrin/discordgo)
+
+## Special Thanks
+
+* Linda (PinkLady)
+* Greg
+* Sam (MrTurtle)
