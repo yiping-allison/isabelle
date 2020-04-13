@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS bug_and_fish (
+name character varying(255), 
+sell_price INT,
+north_start character varying(255),
+north_end character varying(255),
+north_hemi_months character varying(255),
+south_start character varying(255),
+south_end character varying(255),
+south_hemi_months character varying(255),
+time_of_day character varying(255),
+location character varying(255),
+image character varying(255),
+type character varying(255)
+);
+
+COPY bug_and_fish (name, sell_price, north_start, north_end, north_hemi_months, south_start, south_end, south_hemi_months, time_of_day, location, image, type) 
+FROM '[filepath here]' DELIMITER ',' CSV HEADER;

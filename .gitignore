@@ -1,0 +1,9 @@
+# Remove configuration settings
+.config
+server.config
+
+# Remove data
+old_data.csv
+
+# Remove executables
+*.exe
