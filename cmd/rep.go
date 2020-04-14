@@ -31,6 +31,7 @@ func Rep(cmdInfo CommandInfo) {
 		Embed:   msg,
 	}
 	cmdInfo.Ses.ChannelMessageSendComplex(cmdInfo.AppID, cplx)
+	cmdInfo.Ses.ChannelMessageSend(cmdInfo.BotChID, "Application Submitted!")
 }
 
 // mentionUser is a helper func which mentions a user by ID

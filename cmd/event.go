@@ -31,6 +31,7 @@ const (
 	celesteURL  string = "https://vignette.wikia.nocookie.net/animalcrossing/images/a/a5/Acnl-celeste.png/revision/latest/scale-to-width-down/350?cb=20130703203412"
 	daisymaeURL string = "https://vignette.wikia.nocookie.net/animalcrossing/images/8/85/Daisy_Mae.png/revision/latest?cb=20200220213944"
 	meteorURL   string = "https://static0.srcdn.com/wordpress/wp-content/uploads/2020/04/animal-crossing-new-horizon-meteor-shower.jpg"
+	kicksURL    string = "https://vignette.wikia.nocookie.net/animalcrossing/images/2/29/200px-Kicks_3DS.png/revision/latest/scale-to-width-down/350?cb=20140718172000"
 )
 
 // Event will parse through event commands and display embed with
@@ -83,6 +84,8 @@ func Event(cmdInfo CommandInfo) {
 		event = parseCmd(cmd, "Meteor Shower", meteorURL)
 	case "turnip":
 		event = parseCmd(cmd, "Turnip - High Sell Price", daisymaeURL)
+	case "kicks":
+		event = parseCmd(cmd, "Kicks", kicksURL)
 	default:
 		return
 	}
@@ -176,6 +179,7 @@ func Event(cmdInfo CommandInfo) {
 			createFields("Message", event.Msg, false),
 		))
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.ListingID, msg)
+	cmdInfo.Ses.ChannelMessageSend(cmdInfo.BotChID, "Listing Posted!")
 }
 
 // validMsg checks if a message is within text length
