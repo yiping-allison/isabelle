@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS villagers (
+Name character varying(255),
+Image character varying(255)
+);
+
+COPY villagers (Name, Image) 
+FROM '[path]' DELIMITER ',' CSV HEADER;
