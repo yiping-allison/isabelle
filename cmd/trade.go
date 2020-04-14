@@ -93,15 +93,16 @@ func Trade(cmdInfo CommandInfo) {
 
 	// Print Trade Offer
 	msg := cmdInfo.createMsgEmbed(
-		"Trade", tradeThumbURL, user.Mention(), tradeColor,
+		"Trade", tradeThumbURL, "Trade ID: "+id, tradeColor,
 		format(
-			createFields("Trade ID", id, true),
+			createFields("Trader", user.Mention(), true),
 			createFields("Reputation", strconv.Itoa(reps), true),
 			createFields("Trade Listing", strings.Title(t.item), false),
 			createFields("Message", strings.Title(t.msg), false),
 		),
 	)
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.ListingID, msg)
+	cmdInfo.Ses.ChannelMessageSend(cmdInfo.BotChID, "Listing Posted!")
 }
 
 // printTradeList handles printing large amounts of trade offers (since trade offers has no limit)
