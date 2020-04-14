@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -65,11 +66,19 @@ func Queue(cmdInfo CommandInfo) {
 	// Add queue to user tracking
 	cmdInfo.Service.User.AddQueue(cmdInfo.CmdOps[1], user, cmdInfo.Service.Event.GetExpiration(cmdInfo.CmdOps[1]))
 
+	// if user doesn't exist in rep database, create a new one
+	if !cmdInfo.Service.Rep.Exists(user.ID) {
+		cmdInfo.newRep(user.ID)
+	}
+	// retrieve rep
+	rep := cmdInfo.Service.Rep.GetRep(user.ID)
+
 	embed := cmdInfo.createMsgEmbed(
 		"Successfully Added to Queue!", checkThumbURL, "Queue ID: "+cmdInfo.CmdOps[1],
 		successColor, format(
 			createFields("User", user.Mention(), true),
-			createFields("Please Wait Until You're Pinged or Messaged!", "Thank you!", true),
+			createFields("Reputation", strconv.Itoa(rep), true),
+			createFields("Please Wait Until You're Pinged or Messaged!", "Thank you!", false),
 		))
 	cplx := &discordgo.MessageSend{
 		Content: host.Mention() + ": A new person has joined your queue!",

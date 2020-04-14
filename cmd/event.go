@@ -167,6 +167,8 @@ func Event(cmdInfo CommandInfo) {
 	// record expiration time
 	expire := cmdInfo.Service.Event.GetExpiration(id)
 	cmdInfo.Service.User.AddEvent(user, id, expire)
+	// retrieve reputation
+	rep := cmdInfo.Service.Rep.GetRep(user.ID)
 
 	msg := cmdInfo.createMsgEmbed(
 		"Event: "+event.Name,
@@ -175,7 +177,8 @@ func Event(cmdInfo CommandInfo) {
 		eventColor,
 		format(
 			createFields("Hosted By", user.Mention(), true),
-			createFields("Limit", event.Limit, true),
+			createFields("Reputation", strconv.Itoa(rep), true),
+			createFields("Limit", event.Limit, false),
 			createFields("Message", event.Msg, false),
 		))
 	cmdInfo.Ses.ChannelMessageSendEmbed(cmdInfo.ListingID, msg)
